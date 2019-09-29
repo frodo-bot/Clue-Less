@@ -13,5 +13,7 @@
 - [ ] Meaningful Commit Message
 - [ ] git push -u origin <feature_branch_name>
 #### Submitting Pull Request
-- [ ] At https://github.com/frodo-bot/Clue-Less.git select pull request
+After pushing the branch go to the online UI. There should be a 
+"Your recently pushed branches:"
+- [ ] Click Compare & pull request
 - [ ] Set PR to merge feature branch to development branch
