@@ -19,5 +19,6 @@ from django.conf.urls import include
 
 urlpatterns = [
     path('', include('clueless.urls')),
+    path('', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
 ]

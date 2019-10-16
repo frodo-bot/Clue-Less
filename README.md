@@ -36,7 +36,22 @@ conda activate software_eng
 ```
 conda install django
 ```
-To start the app locally, first pull the the latest changes, then navigate to the project top-level directory (clueless_project) and run the command
+- [ ] Install Django Channels with the following command (Anaconda doesn't come with channels, so we have to use pip. Make sure to do this with your envrionment activated):
+```
+pip install channels
+```
+
+Next, you'll need to install Docker desktop. This is the easiest way to install and run Redis, which is a queuing system that Django channels uses to queue messages. 
+- [ ] Go to the Docker website and sign in: https://hub.docker.com/ (the login info is the same as was used for all of the other accounts, and the Docker ID is "fellowshipoftheswe")
+- [ ] Once signed in, click "get started with Docker Desktop".
+- [ ] Download and install Docker
+- [ ] Once it's installed, try to run it (no GUI will come up, but I got a system message saying that Docker Desktop is running)
+
+Now, anytime you want to be running/testing the application Redis will need to be running. You can do this by opening a terminal and entering the following command:
+```
+docker run -p 6379:6379 -d redis:2.8
+```
+Once Redis is running you should be able to run the app. To do this, first pull the the latest changes, then navigate to the project top-level directory (clueless_project) and run the command
 ```
 python .\manage.py runserver
 ```
