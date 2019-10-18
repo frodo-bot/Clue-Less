@@ -1,0 +1,1 @@
+web: gunicorn clueless_project.wsgi --log-file -

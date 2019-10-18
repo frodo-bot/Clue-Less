@@ -1,0 +1,16 @@
+<!-- cluelesstemplates/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}Clue-Less{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  <p><a href="{% url 'logout' %}">logout</a></p>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log in</a>
+  <p>Don't have an account?</p>
+  <a href="{% url 'signup' %}">Sign up</a>
+{% endif %}
+{% endblock %}
