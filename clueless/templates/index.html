@@ -5,8 +5,29 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-  Hi {{ user.username }}!
+  <h1>Hi {{ user.username }}!</h1>
   <p><a href="{% url 'logout' %}">logout</a></p>
+  
+  <p id="game-state"></p>
+  <script type="text/javascript">
+    var isActive = true;
+
+    $(document).ready( function() {
+      pollServer();
+    });
+
+    function pollServer() {
+      $.get("{% url 'game' %}", function(data) {
+        var gameString = "";
+        data.messages.forEach (function(item) {
+          gameString += item += "<br/>"
+        });
+        gameString += data.num
+        $("#game-state").html(gameString);
+      });
+      setTimeout(pollServer, 2000);
+    }
+  </script>
 {% else %}
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log in</a>
