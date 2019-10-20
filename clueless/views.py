@@ -7,7 +7,8 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
 
-messages = []
+suggestions = []
+accusations = {}
 
 def index(request):
     return render(request, 'index.html', {})
@@ -18,30 +19,58 @@ class signup(generic.CreateView):
     template_name = 'signup.html'
 
 def gameState(request):
-    global messages
+    global suggestions
+    global accusations
+    name = request.GET.get('name', '')
+    if name in accusations:
+        userAccusations = accusations[name]
+    else:
+        userAccusations = []
     data = {
-        "messages" : messages
+        "suggestions" : suggestions,
+        "accusations" : userAccusations
+    }
+    return JsonResponse(data)
+
+def makeAccusation(request):
+    global accusations
+    if request.method == 'POST':
+        name = request.POST.get('name', '')
+        if name:
+            character = request.POST.get('character', '')
+            weapon = request.POST.get('weapon', '')
+            room = request.POST.get('room', '')
+            accusationStr = name + " made an accusation: " + character + ", " + weapon + ", " + room
+            if name in accusations:
+                accusations[name].append(accusationStr)
+            else:
+                accusations[name] = [accusationStr]
+    data = {
+        "accusations" : accusations[name]
     }
     return JsonResponse(data)
 
 def makeSuggestion(request):
-    global messages
+    global suggestions
     if request.method == 'POST':
         name = request.POST.get('name', '')
         character = request.POST.get('character', '')
         weapon = request.POST.get('weapon', '')
         room = request.POST.get('room', '')
-        messages.append(name + " made a suggestion: " + character + ", " + weapon + ", " + room)
+        suggestions.append(name + " made a suggestion: " + character + ", " + weapon + ", " + room)
     data = {
-        "messages" : messages
+        "suggestions" : suggestions
     }
     return JsonResponse(data)
 
 def clearState(request):
-    global messages
+    global suggestions
+    global accusations
     if request.method == 'POST':
-        messages.clear()
+        suggestions.clear()
+        accusations.clear()
     data = {
-        "messages" : messages
+        "suggestions" : [],
+        "accusations" : []
     }
     return JsonResponse(data)

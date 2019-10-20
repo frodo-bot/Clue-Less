@@ -9,4 +9,5 @@ urlpatterns = [
     path('game/', views.gameState, name='game'),
     path('game/clear/', views.clearState, name='clear_state'),
     path('suggestion/', views.makeSuggestion, name='suggestion'),
+    path('accusation/', views.makeAccusation, name='accusation'),
 ]
