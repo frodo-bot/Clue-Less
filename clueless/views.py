@@ -19,10 +19,19 @@ class signup(generic.CreateView):
 
 def gameState(request):
     global messages
+    data = {
+        "messages" : messages
+    }
+    return JsonResponse(data)
+
+def makeSuggestion(request):
+    global messages
     if request.method == 'POST':
         name = request.POST.get('name', '')
-        if name:
-            messages.append(name + " sent a message!")
+        character = request.POST.get('character', '')
+        weapon = request.POST.get('weapon', '')
+        room = request.POST.get('room', '')
+        messages.append(name + " made a suggestion: " + character + ", " + weapon + ", " + room)
     data = {
         "messages" : messages
     }

@@ -8,4 +8,5 @@ urlpatterns = [
     path('signup/', views.signup.as_view(), name='signup'),
     path('game/', views.gameState, name='game'),
     path('game/clear/', views.clearState, name='clear_state'),
+    path('suggestion/', views.makeSuggestion, name='suggestion'),
 ]
