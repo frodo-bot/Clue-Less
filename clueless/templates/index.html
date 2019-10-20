@@ -84,8 +84,8 @@
       $.get("{% url 'game' %}", {name: "{{ user.username }}"}, function(data) {
         updateSuggestions(data.suggestions);
         updateAccusations(data.accusations);
-        setTimeout(pollServer, 2000);
       });
+      setTimeout(pollServer, 2000);
     }
 
     function updateSuggestions(items) {
