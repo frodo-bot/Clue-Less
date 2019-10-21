@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
 
-suggestions = []
+SUGGESTIONS_KEY = "suggestions"
 accusations = {}
 
 def index(request):
@@ -19,7 +19,6 @@ class signup(generic.CreateView):
     template_name = 'signup.html'
 
 def gameState(request):
-    global suggestions
     global accusations
     name = request.GET.get('name', '')
     if name in accusations:
@@ -27,7 +26,7 @@ def gameState(request):
     else:
         userAccusations = []
     data = {
-        "suggestions" : suggestions,
+        "suggestions" : getSuggestions(request),
         "accusations" : userAccusations
     }
     return JsonResponse(data)
@@ -51,26 +50,33 @@ def makeAccusation(request):
     return JsonResponse(data)
 
 def makeSuggestion(request):
-    global suggestions
     if request.method == 'POST':
         name = request.POST.get('name', '')
         character = request.POST.get('character', '')
         weapon = request.POST.get('weapon', '')
         room = request.POST.get('room', '')
+        suggestions = getSuggestions(request)
         suggestions.append(name + " made a suggestion: " + character + ", " + weapon + ", " + room)
+        request.session[SUGGESTIONS_KEY] = json.dumps(suggestions)
     data = {
         "suggestions" : suggestions
     }
     return JsonResponse(data)
 
 def clearState(request):
-    global suggestions
     global accusations
     if request.method == 'POST':
-        suggestions.clear()
+        request.session[SUGGESTIONS_KEY] = "[]"
         accusations.clear()
     data = {
         "suggestions" : [],
         "accusations" : []
     }
     return JsonResponse(data)
+
+def getSuggestions(request):
+    suggestions = request.session.get(SUGGESTIONS_KEY)
+    if not suggestions:
+        suggestions = "[]"
+        request.session[SUGGESTIONS_KEY] = suggestions
+    return json.loads(suggestions)
