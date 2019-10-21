@@ -72,7 +72,7 @@
           })
       });
       $("#clear").click(function() {
-        $.post("{% url 'clear_state' %}", {csrfmiddlewaretoken : "{{ csrf_token }}"})
+        $.post("{% url 'clear_state' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", name: "{{ user.username }}"})
           .done(function(data) {
             updateSuggestions(data.suggestions);
             updateAccusations(data.accusations);
