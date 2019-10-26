@@ -6,10 +6,21 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
-from .models import Accusation, Suggestion
+from .models import Accusation, Suggestion, Player, Game
+from django.contrib.auth.models import User
 
 #displays main page
 def index(request):
+    #if a Player object doesn't exist for the current User, create it and save to DB
+    if request.user.is_authenticated:
+        player = Player.objects.filter(user__username=request.user.username)
+        if not player:
+            current_user = User.objects.filter(username=request.user.username)
+            player = Player(user=current_user[0], status="not in game")
+            player.save()
+    game, created = Game.objects.get_or_create(name="test game", status="not started")
+    game.initialize([])
+    #render the main page
     return render(request, 'index.html', {})
 
 #shows the sign-up form
