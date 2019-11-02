@@ -36,6 +36,8 @@
   <br/>
   <br/>
 
+  <button id="create">Create Game</button>
+  <button id="start">Start Game</button>
   <button id="suggest">Make Suggestion</button>
   <button id="accuse">Make Accusation</button>
   <button id="clear">Clear</button>
@@ -51,6 +53,12 @@
     $(document).ready( function() {
       pollServer();
 
+      $("#create").click(function() {
+        $.post("{% url 'creategame' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", name: "{{ user.username }}"})
+      });
+      $("#start").click(function() {
+        $.post("{% url 'startgame' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", name: "{{ user.username }}"})
+      });
       $("#suggest").click(function() {
         var weapon = $('#weapon :selected').text();
         var room = $('#room :selected').text();

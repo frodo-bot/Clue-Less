@@ -18,8 +18,7 @@ def index(request):
             current_user = User.objects.filter(username=request.user.username)
             player = Player(user=current_user[0], status="not in game")
             player.save()
-    game, created = Game.objects.get_or_create(name="test game", status="not started")
-    game.initialize([])
+    
     #render the main page
     return render(request, 'index.html', {})
 
@@ -28,6 +27,30 @@ class signup(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
+
+def createGame(request):
+    # I was just testing stuff in here, this will change when I actually write the views
+    #game = Game(name="test game 2", status="not started")
+    #player1 = Player.objects.filter(user__username=request.user.username)[0]
+    #player2 = Player.objects.filter(user__username="frodo")[0]
+    #game.initialize([player1, player2])
+    return
+
+
+def startGame(request):
+    # I was just testing stuff in here, this will change when I actually write the views
+    #game = Game.objects.filter(pk=5)[0]
+    #print(game.getUnplayedCharacters())
+    #player = game.currentPlayer
+    #game.board.movePlayerToHallway(player, "Hall - Lounge")
+    #next_p = game.getNextPlayer()
+    #game.currentPlayer = next_p
+    #game.save()
+    #next_p = game.getNextPlayer()
+    #print(next_p.user.username)
+    #print(next_p.character)
+    #game.startGame()
+    return
 
 #returns the game state to the polling client
 def gameState(request):
