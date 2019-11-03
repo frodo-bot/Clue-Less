@@ -12,4 +12,7 @@ urlpatterns = [
     path('accusation/', views.makeAccusation, name='accusation'),
     path('creategame/', views.createGame, name='creategame'),
     path('startgame/', views.startGame, name='startgame'),
+    path('moveroom/', views.moveToRoom, name='moveroom'),
+    path('movehall/', views.moveToHallway, name='movehall'),
+    path('endturn/', views.endTurn, name='endturn'),
 ]

@@ -278,7 +278,11 @@ class Board(models.Model):
                 }
 
         for room in rooms:
-            state['rooms'].append({room.name: room.getOccupants()})
+            players = room.getOccupants()
+            room_occupants = []
+            for player in players:
+                room_occupants.append(player.character)
+            state['rooms'].append({room.name: room_occupants})
 
         for hallway in hallways:
             hall_occupants = []

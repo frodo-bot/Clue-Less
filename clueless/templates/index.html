@@ -19,18 +19,32 @@
 
   <h4>Weapon:</h4>
   <select id="weapon">
-    <option value="rope">rope</option>
-    <option value="lead pipe">lead pipe</option>
-    <option value="knife">knife</option>
+    <option value="Rope">rope</option>
+    <option value="Lead Pipe">lead pipe</option>
+    <option value="Knife">knife</option>
   </select>
 
   <br/>
 
   <h4>Room:</h4>
   <select id="room">
-    <option value="study">study</option>
-    <option value="library">library</option>
-    <option value="billiard room">billiard room</option>
+    <option value="Study">Study</option>
+    <option value="Library">Library</option>
+    <option value="Billiard Room">Billiard Room</option>
+    <option value="Hall">Hall</option>
+    <option value="Lounge">Lounge</option>
+    <option value="Conservatory">Conservatory</option>
+  </select>
+
+  <br/>
+
+  <h4>Hallway:</h4>
+  <select id="hallway">
+    <option value="Study - Hall">Study - Hall</option>
+    <option value="Hall - Lounge">Hall - Lounge</option>
+    <option value="Study - Library">Study - Library</option>
+    <option value="Lounge - Dining Room">Lounge - Dining Room</option>
+    <option value="Library - Conservatory">Library - Conservatory</option>
   </select>
 
   <br/>
@@ -38,10 +52,15 @@
 
   <button id="create">Create Game</button>
   <button id="start">Start Game</button>
+  <button id="movetoroom">Move to Room</button>
+  <button id="movetohall">Move to Hallway</button>
   <button id="suggest">Make Suggestion</button>
   <button id="accuse">Make Accusation</button>
   <button id="clear">Clear</button>
+  <button id="endturn">End Turn</button>
 
+  <h2>Messages</h2>
+  <p id="messages"></p>
   <h2>Suggestions</h2>
   <p id="game-suggestions"></p>
   <h2>Accusations</h2>
@@ -58,6 +77,22 @@
       });
       $("#start").click(function() {
         $.post("{% url 'startgame' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", name: "{{ user.username }}"})
+      });
+      $("#movetoroom").click(function() {
+        var room = $('#room :selected').text();
+        $.post("{% url 'moveroom' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", room: room})
+          .done(function(data) {
+            data = JSON.parse(data)
+            showMessage(data.message, data.messageFor);
+          })
+      });
+      $("#movetohall").click(function() {
+        var hallway = $('#hallway :selected').text();
+        $.post("{% url 'movehall' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", hallway: hallway})
+          .done(function(data) {
+            data = JSON.parse(data)
+            showMessage(data.message, data.messageFor);
+          })
       });
       $("#suggest").click(function() {
         var weapon = $('#weapon :selected').text();
@@ -86,6 +121,13 @@
             updateAccusations(data.accusations);
           })
       });
+      $("#endturn").click(function() {
+        $.post("{% url 'endturn' %}", {csrfmiddlewaretoken : "{{ csrf_token }}"})
+          .done(function(data) {
+            data = JSON.parse(data)
+            showMessage(data.message, data.messageFor);
+          })
+      });
     });
 
     function pollServer() {
@@ -110,6 +152,20 @@
         gameString += item += "<br/>";
       });
       $("#game-accusations").html(gameString);
+    }
+
+    function showMessage(message, audience) {
+      var newText = "";
+      if (audience === "all") {
+        newText = $("#messages").text() + message + "<br/>";
+      }
+      else if (audience === "{{ user.username }}") {
+        newText = $("#messages").text() + message + "<br/>";
+      }
+      else {
+        newText = $("#messages").text()
+      }
+      $("#messages").html(newText);
     }
   </script>
 {% else %}

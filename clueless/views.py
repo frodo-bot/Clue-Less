@@ -28,96 +28,118 @@ class signup(generic.CreateView):
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
 
+
+#this will create a new game using a list of usernames. NOTE: This assumes that a list of usernames
+#   is provided in the request in the field "players" and a name for the game is provided in the field "name"
 def createGame(request):
-    # I was just testing stuff in here, this will change when I actually write the views
-    #game = Game(name="test game 2", status="not started")
-    #player1 = Player.objects.filter(user__username=request.user.username)[0]
-    #player2 = Player.objects.filter(user__username="frodo")[0]
-    #game.initialize([player1, player2])
-    return
+    player_list = []
+    for name in request.POST.get('players', ''):
+        player = Player.objects.filter(user__username=name)[0]
+        player_list.append(player)
+    
+    game_name = request.POST.get('name', '')
+    game = Game(name=game_name, status="not started")
+    game.initialize(player_list)
+    return JsonResponse(game.getGameState())
 
-
+#will use the requesting user to start the game
 def startGame(request):
-    # I was just testing stuff in here, this will change when I actually write the views
-    #game = Game.objects.filter(pk=5)[0]
-    #print(game.getUnplayedCharacters())
-    #player = game.currentPlayer
-    #game.board.movePlayerToHallway(player, "Hall - Lounge")
-    #next_p = game.getNextPlayer()
-    #game.currentPlayer = next_p
-    #game.save()
-    #next_p = game.getNextPlayer()
-    #print(next_p.user.username)
-    #print(next_p.character)
-    #game.startGame()
-    return
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    player.game.startGame()
+    return JsonResponse(player.game.getGameState())
 
-#returns the game state to the polling client
-def gameState(request):
-    name = request.GET.get('name', '')
-
-    #query for all accusations made by current user and return
-    queryset_acc = Accusation.objects.filter(user=name)
-    acc_list = []
-    for item in queryset_acc:
-        acc_list.append(item.text)
-
-    #query for all suggestions and return list
-    queryset_sug = Suggestion.objects.all()
-    sug_list = []
-    for item in queryset_sug:
-        sug_list.append(item.text)
-
-    data = {
-        "suggestions" : sug_list,
-        "accusations" : acc_list
-    }
-    return JsonResponse(data)
-
-#reponds to HTTP requests for making an accusation
-def makeAccusation(request):
-    global accusations
+#will check room against valid moves, and then move the player there. Will return success or failure
+#   message with game state
+def moveToRoom(request):
     if request.method == 'POST':
-        name = request.POST.get('name', '')
-        if name:
-            character = request.POST.get('character', '')
-            weapon = request.POST.get('weapon', '')
-            room = request.POST.get('room', '')
-            accusationStr = name + " made an accusation: " + character + ", " + weapon + ", " + room
-            
-            #create accusation object and save it to database
-            acc = Accusation(user=name, text=accusationStr)
-            acc.save()
+        name = request.user.username
+        room = request.POST.get('room', '')
+        player = Player.objects.filter(user__username=name)[0]
+        message = ""
+        if room in player.getValidMoves():
+            player.game.board.movePlayerToRoom(player, room)
+            message = name + " (" + player.character + ") " + "moved to the " + room
+        else:
+            message = name + " (" + player.character + ") " + "tried to move to the " + room + ", which is an invalid move"
 
-    #query for all accusations made by current user and return
-    queryset = Accusation.objects.filter(user=name)
-    acc_list = []
-    for item in queryset:
-        acc_list.append(item.text)
+        gameState = json.loads(player.game.getGameState())
+        gameState["message"] = message
+        gameState["messageFor"] = "all"
+        gameState = json.dumps(gameState)
+        
+    return JsonResponse(gameState, safe=False)
 
-    return JsonResponse({"accusations" : acc_list})
+#will check hallway against valid moves, and then move the player there. Will return success or failure
+#   message with game state
+def moveToHallway(request):
+    if request.method == 'POST':
+        name = request.user.username
+        hallway = request.POST.get('hallway', '')
+        player = Player.objects.filter(user__username=name)[0]
+        message = ""
+        if hallway in player.getValidMoves():
+            player.game.board.movePlayerToHallway(player, hallway)
+            message = name + " (" + player.character + ") " + "moved to the " + hallway + " hallway"
+        else:
+            message = name + " (" + player.character + ") " + "tried to move to the " + hallway + " hallway, which is an invalid move"
+
+        gameState = json.loads(player.game.getGameState())
+        gameState["message"] = message
+        gameState["messageFor"] = "all"
+        gameState = json.dumps(gameState)
+        
+    return JsonResponse(gameState, safe=False)
+
+#return the valid moves in a JSON in the format {"rooms": <list of valid rooms>, "hallways":<list of valid hallways>}
+def validMoves(request):
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    move_list = player.getValidMoves()
+    moves = {
+        "rooms": [],
+        "hallways": [],
+    }
+    for move in move_list:
+        if "-" in move:
+            moves["hallways"].append(move)
+        else:
+            moves["rooms"].append(move)
+
+    return JsonResponse(json.dumps(moves), safe=False)
+
 
 #responds to HTTP request for making a suggestion
 def makeSuggestion(request):
-    global suggestions
-    if request.method == 'POST':
-        name = request.POST.get('name', '')
-        character = request.POST.get('character', '')
-        weapon = request.POST.get('weapon', '')
-        room = request.POST.get('room', '')
-        suggestionStr = name + " made an suggestion: " + character + ", " + weapon + ", " + room
+    return
 
-        #create suggestion object and save it to database
-        sug = Suggestion(user=name, text=suggestionStr)
-        sug.save()
 
-    #query for all suggestions and return list
-    queryset = Suggestion.objects.all()
-    sug_list = []
-    for item in queryset:
-        sug_list.append(item.text)
+#checks other player's cards for the ability to disprove a suggestion
+def disproveSuggestion(request):
+    return
 
-    return JsonResponse({"suggestions" : sug_list})
+
+
+#reponds to HTTP requests for making an accusation
+def makeAccusation(request):
+    return
+
+#ends the current players turn and updates game's current player to be the next player
+def endTurn(request):
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    game = Game.objects.filter(currentPlayer=player)[0]
+    next_p = game.getNextPlayer()
+    game.currentPlayer = next_p
+    game.save()
+    response = {"message": player.user.username + "ended turn. It is now " + next_p.user.username + "'s turn.",
+                "messageFor": "all"
+                }
+    return JsonResponse(json.dumps(response), safe=False)
+
+
+#returns the game state to the polling client
+def gameState(request):
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    return JsonResponse(player.game.getGameState(), safe=False)
+
 
 #clears the database (TEMPORARY for skeletal increment only)
 def clearState(request):
