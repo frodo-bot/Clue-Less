@@ -6,6 +6,9 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('signup/', views.signup.as_view(), name='signup'),
+    path('lobby/', views.lobby, name='lobby'),
+    path('lobby/leave/', views.leaveLobby, name='lobby-leave'),
+    path('lobby/players/', views.getLobbyPlayers, name='lobby-players'),
     path('game/', views.gameState, name='game'),
     path('game/clear/', views.clearState, name='clear_state'),
     path('suggestion/', views.makeSuggestion, name='suggestion'),

@@ -1,5 +1,6 @@
 # Create your views here.
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 import json
 from django.contrib.auth.forms import UserCreationForm
@@ -21,6 +22,27 @@ def index(request):
     
     #render the main page
     return render(request, 'index.html', {})
+
+def lobby(request):
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    if player:
+        player.status = "in lobby"
+        player.save()
+    return render(request, 'lobby.html', {})
+
+def leaveLobby(request):
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    if player:
+        player.status = "not in game"
+        player.save()
+    return redirect('/')
+
+def getLobbyPlayers(request):
+    players = Player.objects.filter(status="in lobby")
+    player_names = []
+    for player in players:
+        player_names.append(player.user.get_username())
+    return JsonResponse(json.dumps(player_names))
 
 #shows the sign-up form
 class signup(generic.CreateView):

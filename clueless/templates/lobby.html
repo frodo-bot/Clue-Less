@@ -1,0 +1,33 @@
+<!-- cluelesstemplates/lobby.html -->
+{% extends 'base.html' %}
+
+{% block title %}Clue-Less{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    <h1>Clue-Less Lobby</h1>
+    <a href="{% url 'lobby-leave' %}">Leave Lobby</a>
+    <br />
+    
+    <h2>Players:</h2>
+    
+    <ul id="player-list"></ul>
+
+    <script>
+        $(document).ready( function() { 
+            getPlayers();
+
+            function getPlayers() {
+                $.get("{% url 'lobby-players' %}", {}, function(data) {
+                    console.log(data);
+                });
+                setTimeout(getPlayers, 2000);
+            }
+        });
+    </script>
+{% else %}
+    <script>
+        location.replace("{% url 'index' %}")
+    </script>
+{% endif %}
+{% endblock %}
