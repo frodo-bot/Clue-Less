@@ -42,7 +42,7 @@ def getLobbyPlayers(request):
     player_names = {"players": []}
     for player in players:
         player_names["players"].append(player.user.username)
-    return JsonResponse(json.dumps(player_names))
+    return JsonResponse(player_names)
 
 #shows the sign-up form
 class signup(generic.CreateView):
