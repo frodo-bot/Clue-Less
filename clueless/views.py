@@ -19,7 +19,7 @@ def index(request):
             current_user = User.objects.filter(username=request.user.username)
             player = Player(user=current_user[0], status="not in game")
             player.save()
-    
+
     #render the main page
     return render(request, 'index.html', {})
 
@@ -39,9 +39,9 @@ def leaveLobby(request):
 
 def getLobbyPlayers(request):
     players = Player.objects.filter(status="in lobby")
-    player_names = []
+    player_names = {"players": []}
     for player in players:
-        player_names.append(player.user.get_username())
+        player_names["players"].append(player.user.username)
     return JsonResponse(json.dumps(player_names))
 
 #shows the sign-up form
@@ -58,7 +58,7 @@ def createGame(request):
     for name in request.POST.get('players', ''):
         player = Player.objects.filter(user__username=name)[0]
         player_list.append(player)
-    
+
     game_name = request.POST.get('name', '')
     game = Game(name=game_name, status="not started")
     game.initialize(player_list)
@@ -88,7 +88,7 @@ def moveToRoom(request):
         gameState["message"] = message
         gameState["messageFor"] = "all"
         gameState = json.dumps(gameState)
-        
+
     return JsonResponse(gameState, safe=False)
 
 #will check hallway against valid moves, and then move the player there. Will return success or failure
@@ -109,7 +109,7 @@ def moveToHallway(request):
         gameState["message"] = message
         gameState["messageFor"] = "all"
         gameState = json.dumps(gameState)
-        
+
     return JsonResponse(gameState, safe=False)
 
 #return the valid moves in a JSON in the format {"rooms": <list of valid rooms>, "hallways":<list of valid hallways>}
