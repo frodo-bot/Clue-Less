@@ -19,6 +19,8 @@ def index(request):
             current_user = User.objects.filter(username=request.user.username)
             player = Player(user=current_user[0], status="not in game")
             player.save()
+        elif player[0].status == "in lobby":
+            return redirect('/lobby')
 
     #render the main page
     return render(request, 'index.html', {})
