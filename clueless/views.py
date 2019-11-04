@@ -31,10 +31,11 @@ def lobby(request):
     return render(request, 'lobby.html', {})
 
 def leaveLobby(request):
-    player = Player.objects.filter(user__username=request.user.username)[0]
-    if player:
-        player.status = "not in game"
-        player.save()
+    if request.user.is_authenticated:
+        player = Player.objects.filter(user__username=request.user.username)[0]
+        if player:
+            player.status = "not in game"
+            player.save()
     return redirect('/')
 
 def getLobbyPlayers(request):
