@@ -27,8 +27,10 @@ def index(request):
     #render the main page
     return render(request, 'index.html', {})
 
+#displays lobby page
 def lobby(request):
     players = Player.objects.filter(status="in lobby")
+    #if six players already in lobby, then let the user know the lobby is full
     if len(players) >= 6:
         return render(request, 'full-lobby.html', {})
     player = Player.objects.filter(user__username=request.user.username)[0]
@@ -37,6 +39,7 @@ def lobby(request):
         player.save()
     return render(request, 'lobby.html', {})
 
+#leave the lobby and go back to the main page
 def leaveLobby(request):
     if request.user.is_authenticated:
         player = Player.objects.filter(user__username=request.user.username)[0]
@@ -45,6 +48,8 @@ def leaveLobby(request):
             player.save()
     return redirect('/')
 
+#returns the players currently in the lobby and a status for the player making the request
+#   the status will be used to move the player from the lobby to the play game page
 def getLobbyPlayers(request):
     players = Player.objects.filter(status="in lobby")
     lobby_state = {"players": [], "status": ""}
@@ -54,6 +59,7 @@ def getLobbyPlayers(request):
     lobby_state["status"] = player.status
     return JsonResponse(lobby_state)
 
+#displays play game page
 def playGame(request):
     if request.user.is_authenticated:
         player = Player.objects.filter(user__username=request.user.username)[0]
@@ -82,13 +88,15 @@ def createGame(request):
     game_name = request.POST.get('name', '')
     game = Game(name=game_name, status="not started")
     game.initialize(player_list)
+    #create and start game together (TEMPORARY for minimal increment only)
+    startGame(request)
     return JsonResponse(game.getGameState(), safe=False)
 
 #will use the requesting user to start the game
 def startGame(request):
     player = Player.objects.filter(user__username=request.user.username)[0]
     player.game.startGame()
-    return JsonResponse(player.game.getGameState())
+    return JsonResponse(player.game.getGameState(), safe=False)
 
 #will check room against valid moves, and then move the player there. Will return success or failure
 #   message with game state

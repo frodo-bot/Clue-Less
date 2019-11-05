@@ -22,7 +22,7 @@
 
             $("#create-button").click(function() {
                 $.post("{% url 'creategame' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", players: players,
-                  name: "test_game"})
+                  name: "main-game"})
                   .done(function(data) {
                     console.log(data);
                   });
