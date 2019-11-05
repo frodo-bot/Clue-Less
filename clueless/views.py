@@ -26,6 +26,9 @@ def index(request):
     return render(request, 'index.html', {})
 
 def lobby(request):
+    players = Player.objects.filter(status="in lobby")
+    if len(players) >= 6:
+        return render(request, 'full-lobby.html', {})
     player = Player.objects.filter(user__username=request.user.username)[0]
     if player:
         player.status = "in lobby"
@@ -47,6 +50,15 @@ def getLobbyPlayers(request):
         player_names["players"].append(player.user.username)
     return JsonResponse(player_names)
 
+#Want to use this to move from lobby to game by checking for change in status
+def getLobbyStatus(request):
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    status = {"status": player.status}
+    return JsonResponse(status)
+
+def playGame(request):
+    return render(request, 'play.html',{})
+
 #shows the sign-up form
 class signup(generic.CreateView):
     form_class = UserCreationForm
@@ -60,6 +72,8 @@ def createGame(request):
     player_list = []
     for name in request.POST.get('players', ''):
         player = Player.objects.filter(user__username=name)[0]
+        player.status = "in game"
+        player.save()
         player_list.append(player)
 
     game_name = request.POST.get('name', '')

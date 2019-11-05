@@ -1,0 +1,14 @@
+<!-- cluelesstemplates/play.html -->
+{% extends 'base.html' %}
+
+{% block title %}Clue-Less{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    <h1>Play Game</h1>
+{% else %}
+    <script>
+        location.replace("{% url 'index' %}")
+    </script>
+{% endif %}
+{% endblock %}

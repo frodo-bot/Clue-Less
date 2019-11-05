@@ -9,6 +9,7 @@ urlpatterns = [
     path('lobby/', views.lobby, name='lobby'),
     path('lobby/leave/', views.leaveLobby, name='lobby-leave'),
     path('lobby/players/', views.getLobbyPlayers, name='lobby-players'),
+    path('play/', views.playGame, name='play-game'),
     path('game/', views.gameState, name='game'),
     path('game/clear/', views.clearState, name='clear_state'),
     path('suggestion/', views.makeSuggestion, name='suggestion'),

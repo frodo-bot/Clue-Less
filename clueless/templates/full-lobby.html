@@ -1,0 +1,15 @@
+<!-- cluelesstemplates/full-lobby.html -->
+{% extends 'base.html' %}
+
+{% block title %}Clue-Less{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    <h1>The lobby is full. Try again later.</h1>
+    <a href="{% url 'index' %}">Go Back</a>
+{% else %}
+    <script>
+        location.replace("{% url 'index' %}")
+    </script>
+{% endif %}
+{% endblock %}

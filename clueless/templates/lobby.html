@@ -7,8 +7,9 @@
 {% if user.is_authenticated %}
     <h1>Clue-Less Lobby</h1>
     <a href="{% url 'lobby-leave' %}">Leave Lobby</a>
+    <br /><br />
+    <button id="create-button" onclick="window.location.href = '{% url 'index' %}';" disabled>Create Game</button>
     <br />
-
     <h2>Players:</h2>
 
     <ul id="player-list"></ul>
@@ -24,8 +25,15 @@
                       playerList += "<li>" + item + "</li>"
                     });
                     $("#player-list").html(playerList);
+
+                    if (data.players.length < 3) {
+                      $("#create-button").attr("disabled", true)
+                    } else {
+                      $("#create-button").attr("disabled", false)
+                    }
+
                 });
-                setTimeout(getPlayers, 2000);
+                setTimeout(getPlayers, 1000);
             }
         });
     </script>
