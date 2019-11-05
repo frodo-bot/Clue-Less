@@ -68,16 +68,13 @@ def createGame(request):
     player_list = []
     for name in request.POST.getlist('players[]'):
         player = Player.objects.filter(user__username=name)[0]
-        player.status = "in game"
         player.save()
         player_list.append(player)
 
     game_name = request.POST.get('name', '')
     game = Game(name=game_name, status="not started")
     game.initialize(player_list)
-    #commented out return statement for now, might have to put it back
-    #return JsonResponse(game.getGameState())
-    return JsonResponse({})
+    return JsonResponse(game.getGameState(), safe=False)
 
 #will use the requesting user to start the game
 def startGame(request):

@@ -58,14 +58,14 @@ class Player(models.Model):
         return move_list
 
     # returns a list of the valid actions that a user can take (i.e. make suggestion or accusation)
-    def getValidActions(self): 
+    def getValidActions(self):
         action_list = []
         if self.game.currentPlayer == self:
             if self.status != "lost":
                 if self.inRoom():
                     if not self.hasMadeSuggestionInRoom:
                         action_list.append("Make Suggestion")
-                action_list.append("Make Accusation")  
+                action_list.append("Make Accusation")
         return action_list
 
     #returns a list of the cards that a player owns
@@ -118,7 +118,7 @@ class Game(models.Model):
 
         self.save()
 
-    #starts the game by randomizing the case file, handing out the rest of the cards to the 
+    #starts the game by randomizing the case file, handing out the rest of the cards to the
     #   players, setting currentPlayer to whoever has the Miss Scarlet character, and changing
     #   game status to "in progress"
     def startGame(self):
@@ -148,7 +148,7 @@ class Game(models.Model):
         case_file.randomize(game_id=self.pk)
         case_file.save()
         self.solution = case_file
- 
+
         cards = []
         queryset = Card.objects.filter(game=self)
         for item in queryset:
@@ -179,11 +179,16 @@ class Game(models.Model):
     def getGameState(self):
         state = {
             'status': self.status,
-            'currentCharacter': self.currentPlayer.character,
-            'currentPlayer': self.currentPlayer.user.username,
+            'currentCharacter': '',
+            'currentPlayer': '',
             'name': self.name,
             'board': json.loads(self.board.getBoardState()),
         }
+
+        if self.currentPlayer:
+            state['currentCharacter'] = self.currentPlayer.character
+            state['currentPlayer'] = self.currentPlayer.user.username
+            
         return json.dumps(state)
 
     #checks whether an accusation is correct against the case file stored in the game object. If
@@ -200,7 +205,7 @@ class Game(models.Model):
         else:
             return False
 
-    #compares the cards that a player has to the cards in a suggestion, returns a list of the 
+    #compares the cards that a player has to the cards in a suggestion, returns a list of the
     #   ones that match. If none match, returns an empty list
     def checkSuggestion(self, playerCards, suggestionCards):
         card_matches = []
@@ -273,7 +278,7 @@ class Board(models.Model):
     def getBoardState(self):
         rooms = Room.objects.filter(board=self)
         hallways = Hallway.objects.filter(board=self)
-        state = {'rooms': [], 
+        state = {'rooms': [],
                 'hallways': [],
                 }
 
@@ -299,7 +304,7 @@ class Board(models.Model):
         player.currentHallway = None
         player.hasMadeSuggestionInRoom = False
         player.save()
-        return 
+        return
 
      #moves a player to a particular hallway on the board. No return value
     def movePlayerToHallway(self, player, hallwayName):

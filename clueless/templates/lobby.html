@@ -21,7 +21,6 @@
             getPlayers();
 
             $("#create-button").click(function() {
-                console.log(players);
                 $.post("{% url 'creategame' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", players: players,
                   name: "test_game"})
                   .done(function(data) {

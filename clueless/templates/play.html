@@ -6,6 +6,17 @@
 {% block content %}
 {% if user.is_authenticated %}
     <h1>Play Game</h1>
+
+    <script>
+        getGameState();
+
+        function getGameState() {
+          $.get("{% url 'game' %}", {}, function(data) {
+            console.log(data);
+          });
+          setTimeout(getGameState, 2000);
+        }
+    </script>
 {% else %}
     <script>
         location.replace("{% url 'index' %}")
