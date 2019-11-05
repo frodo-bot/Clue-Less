@@ -21,6 +21,8 @@ def index(request):
             player.save()
         elif player[0].status == "in lobby":
             return redirect('/lobby')
+        elif player[0].status == "in game":
+            return redirect('/play')
 
     #render the main page
     return render(request, 'index.html', {})
@@ -53,6 +55,12 @@ def getLobbyPlayers(request):
     return JsonResponse(lobby_state)
 
 def playGame(request):
+    if request.user.is_authenticated:
+        player = Player.objects.filter(user__username=request.user.username)[0]
+        if player.status == "in lobby":
+            return redirect('/lobby')
+        elif player.status == "not in game":
+            return redirect('/')
     return render(request, 'play.html',{})
 
 #shows the sign-up form
