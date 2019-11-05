@@ -5,57 +5,106 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-    <h1>Play Game</h1>
+      <h1>Play Game</h1>
 
-    <table border="1">
-      <tbody>
-    		<tr>
-    			<td>Study</td>
-    			<td>Study - Hall</td>
-    			<td>Hall</td>
-    			<td>Hall - Lounge</td>
-          <td>Lounge</td>
-    		</tr>
-    		<tr>
-    			<td>Study - Library</td>
-    			<td></td>
-    			<td>Hall - Billiard Room</td>
-    			<td></td>
-          <td>Lounge - Dining Room</td>
-    		</tr>
-    		<tr>
-    			<td>Library</td>
-    			<td>Library - Billiard Room</td>
-    			<td>Billiard Room</td>
-    			<td>Billiard Room - Dining Room</td>
-          <td>Dining Room</td>
-    		</tr>
-        <tr>
-    			<td>Library - Conservatory</td>
-    			<td></td>
-    			<td>Billiard Room - Ballroom</td>
-    			<td></td>
-          <td>Dining Room - Kitchen</td>
-    		</tr>
-        <tr>
-    			<td>Conservatory</td>
-    			<td>Conservatory - Ballroom</td>
-    			<td>Ballroom</td>
-    			<td>Ballroom - Kitchen</td>
-          <td>Kitchen</td>
-    		</tr>
-  	  </tbody>
-  </table>
+      <h3>Player List</h3>
+      <ul id="player-list"></ul>
+
+      <h3>Game Board</h3>
+      <table border="1">
+        <tbody>
+      		<tr>
+      			<td>Study</td>
+      			<td>Study - Hall</td>
+      			<td>Hall</td>
+      			<td>Hall - Lounge</td>
+            <td>Lounge</td>
+      		</tr>
+      		<tr>
+      			<td>Study - Library</td>
+      			<td></td>
+      			<td>Hall - Billiard Room</td>
+      			<td></td>
+            <td>Lounge - Dining Room</td>
+      		</tr>
+      		<tr>
+      			<td>Library</td>
+      			<td>Library - Billiard Room</td>
+      			<td>Billiard Room</td>
+      			<td>Billiard Room - Dining Room</td>
+            <td>Dining Room</td>
+      		</tr>
+          <tr>
+      			<td>Library - Conservatory</td>
+      			<td></td>
+      			<td>Billiard Room - Ballroom</td>
+      			<td></td>
+            <td>Dining Room - Kitchen</td>
+      		</tr>
+          <tr>
+      			<td>Conservatory</td>
+      			<td>Conservatory - Ballroom</td>
+      			<td>Ballroom</td>
+      			<td>Ballroom - Kitchen</td>
+            <td>Kitchen</td>
+      		</tr>
+    	  </tbody>
+    </table>
+
+    <h4>Character:</h4>
+    <select id="character">
+      <option value="Miss Scarlet">Miss Scarlet</option>
+      <option value="Mrs. Peacock">Mrs. Peacock</option>
+      <option value="Professor Plum">Professor Plum</option>
+      <option value="Mr. Green">Mr. Green</option>
+      <option value="Colonel Mustard">Colonel Mustard</option>
+      <option value="Mrs. White">Mrs. White</option>
+    </select>
+
+    <br/>
+
+    <h4>Weapon:</h4>
+    <select id="weapon">
+      <option value="Rope">Rope</option>
+      <option value="Lead Pipe">Lead Pipe</option>
+      <option value="Knife">Knife</option>
+      <option value="Wrench">Wrench</option>
+      <option value="Candlestick">Candlestick</option>
+      <option value="Revolver">Revolver</option>
+    </select>
+
+    <br/>
+
+    <h4>Room:</h4>
+    <select id="room">
+      <option value="Study">Study</option>
+      <option value="Hall">Hall</option>
+      <option value="Lounge">Lounge</option>
+      <option value="Library">Library</option>
+      <option value="Billiard Room">Billiard Room</option>
+      <option value="Dining Room">Dining Room</option>
+      <option value="Conservatory">Conservatory</option>
+      <option value="Ballroom">Ballroom</option>
+      <option value="Kitchen">Kitchen</option>
+    </select>
 
     <script>
-        getGameState();
+        $(document).ready( function() {
+            getPlayers();
+            getGameState();
 
-        function getGameState() {
-          $.get("{% url 'game' %}", {}, function(data) {
-            console.log(data);
-          });
-          setTimeout(getGameState, 2000);
-        }
+            function getGameState() {
+              $.get("{% url 'game' %}", {}, function(data) {
+                console.log(data);
+              });
+              setTimeout(getGameState, 2000);
+            }
+
+            function getPlayers() {
+              // TODO: Get list of players in game and display username - character
+              //  Put the result into player-list
+            }
+        });
     </script>
 {% else %}
     <script>
