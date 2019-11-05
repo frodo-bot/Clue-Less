@@ -7,6 +7,46 @@
 {% if user.is_authenticated %}
     <h1>Play Game</h1>
 
+    <table border="1">
+      <tbody>
+    		<tr>
+    			<td>Study</td>
+    			<td>Study - Hall</td>
+    			<td>Hall</td>
+    			<td>Hall - Lounge</td>
+          <td>Lounge</td>
+    		</tr>
+    		<tr>
+    			<td>Study - Library</td>
+    			<td></td>
+    			<td>Hall - Billiard Room</td>
+    			<td></td>
+          <td>Lounge - Dining Room</td>
+    		</tr>
+    		<tr>
+    			<td>Library</td>
+    			<td>Library - Billiard Room</td>
+    			<td>Billiard Room</td>
+    			<td>Billiard Room - Dining Room</td>
+          <td>Dining Room</td>
+    		</tr>
+        <tr>
+    			<td>Library - Conservatory</td>
+    			<td></td>
+    			<td>Billiard Room - Ballroom</td>
+    			<td></td>
+          <td>Dining Room - Kitchen</td>
+    		</tr>
+        <tr>
+    			<td>Conservatory</td>
+    			<td>Conservatory - Ballroom</td>
+    			<td>Ballroom</td>
+    			<td>Ballroom - Kitchen</td>
+          <td>Kitchen</td>
+    		</tr>
+  	  </tbody>
+  </table>
+
     <script>
         getGameState();
 
