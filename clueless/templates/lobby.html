@@ -8,7 +8,7 @@
     <h1>Clue-Less Lobby</h1>
     <a href="{% url 'lobby-leave' %}">Leave Lobby</a>
     <br /><br />
-    <button id="create-button" onclick="window.location.href = '{% url 'index' %}';" disabled>Create Game</button>
+    <button id="create-button" disabled>Create Game</button>
     <br />
     <h2>Players:</h2>
 
@@ -16,20 +16,35 @@
 
     <script>
         $(document).ready( function() {
+            var players = [];
+
             getPlayers();
+
+            $("#create-button").click(function() {
+                console.log(players);
+                $.post("{% url 'creategame' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", players: players,
+                  name: "test_game"})
+                  .done(function(data) {
+                    console.log(data);
+                  });
+            });
 
             function getPlayers() {
                 $.get("{% url 'lobby-players' %}", {}, function(data) {
+                    if (data.status == "in game") {
+                      location.replace("{% url 'play-game' %}")
+                    }
+                    players = data.players;
                     var playerList = "";
                     data.players.forEach(function(item) {
-                      playerList += "<li>" + item + "</li>"
+                      playerList += "<li>" + item + "</li>";
                     });
                     $("#player-list").html(playerList);
 
                     if (data.players.length < 3) {
-                      $("#create-button").attr("disabled", true)
+                      $("#create-button").attr("disabled", true);
                     } else {
-                      $("#create-button").attr("disabled", false)
+                      $("#create-button").attr("disabled", false);
                     }
 
                 });

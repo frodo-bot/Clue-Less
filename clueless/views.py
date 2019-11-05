@@ -45,16 +45,12 @@ def leaveLobby(request):
 
 def getLobbyPlayers(request):
     players = Player.objects.filter(status="in lobby")
-    player_names = {"players": []}
+    lobby_state = {"players": [], "status": ""}
     for player in players:
-        player_names["players"].append(player.user.username)
-    return JsonResponse(player_names)
-
-#Want to use this to move from lobby to game by checking for change in status
-def getLobbyStatus(request):
+        lobby_state["players"].append(player.user.username)
     player = Player.objects.filter(user__username=request.user.username)[0]
-    status = {"status": player.status}
-    return JsonResponse(status)
+    lobby_state["status"] = player.status
+    return JsonResponse(lobby_state)
 
 def playGame(request):
     return render(request, 'play.html',{})
@@ -70,7 +66,7 @@ class signup(generic.CreateView):
 #   is provided in the request in the field "players" and a name for the game is provided in the field "name"
 def createGame(request):
     player_list = []
-    for name in request.POST.get('players', ''):
+    for name in request.POST.getlist('players[]'):
         player = Player.objects.filter(user__username=name)[0]
         player.status = "in game"
         player.save()
@@ -79,7 +75,9 @@ def createGame(request):
     game_name = request.POST.get('name', '')
     game = Game(name=game_name, status="not started")
     game.initialize(player_list)
-    return JsonResponse(game.getGameState())
+    #commented out return statement for now, might have to put it back
+    #return JsonResponse(game.getGameState())
+    return JsonResponse({})
 
 #will use the requesting user to start the game
 def startGame(request):
