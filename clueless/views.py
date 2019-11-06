@@ -109,15 +109,13 @@ def moveToRoom(request):
         if room in player.getValidMoves():
             player.game.board.movePlayerToRoom(player, room)
             message = name + " (" + player.character + ") " + "moved to the " + room
-        else:
-            message = name + " (" + player.character + ") " + "tried to move to the " + room + ", which is an invalid move"
+            notif = Notification(content=message)
+            notif.save()
 
-        gameState = json.loads(player.game.getGameState())
-        gameState["message"] = message
-        gameState["messageFor"] = "all"
-        gameState = json.dumps(gameState)
-
+        gameState = player.game.getGameState()
+        
     return JsonResponse(gameState, safe=False)
+
 
 #will check hallway against valid moves, and then move the player there. Will return success or failure
 #   message with game state
@@ -130,15 +128,13 @@ def moveToHallway(request):
         if hallway in player.getValidMoves():
             player.game.board.movePlayerToHallway(player, hallway)
             message = name + " (" + player.character + ") " + "moved to the " + hallway + " hallway"
-        else:
-            message = name + " (" + player.character + ") " + "tried to move to the " + hallway + " hallway, which is an invalid move"
+            notif = Notification(content=message)
+            notif.save()
 
-        gameState = json.loads(player.game.getGameState())
-        gameState["message"] = message
-        gameState["messageFor"] = "all"
-        gameState = json.dumps(gameState)
-
+        gameState = player.game.getGameState()
+        
     return JsonResponse(gameState, safe=False)
+
 
 #return the valid moves in a JSON in the format {"rooms": <list of valid rooms>, "hallways":<list of valid hallways>}
 def validMoves(request):
@@ -159,7 +155,32 @@ def validMoves(request):
 
 #responds to HTTP request for making a suggestion
 def makeSuggestion(request):
-    return
+    if request.method == 'POST':
+        name = request.user.username
+        player = Player.objects.filter(user__username=name)[0]
+        character = request.POST.get('character', '')
+        weapon = request.POST.get('weapon', '')
+        room = request.POST.get('room', '')
+
+        message = ""
+        if "Make Suggestion" in player.getValidActions():
+            if room == player.currentRoom.name:
+                suggPlayer = Player.objects.filter(game=player.game, character=character)
+                if suggPlayer.currentRoom.name != room:
+                    suggPlayer.game.board.movePlayerToRoom(suggPlayer, room)
+                    message = name + " suggested that the crime was committed in the " + room + " by " + character + " with the " + weapon + ". " + character + " has been moved to the " + room + " for this suggestion."
+                else:
+                    message = name + " suggested that the crime was committed in the " + room + " by " + character + " with the " + weapon + ". "
+                notif = Notification(content=message)
+                notif.save()
+            else:
+                return JsonResponse({"error": "You must be in the room that you want to make a suggestion for."}, safe=False)
+        else:
+            return JsonResponse({"error": "You cannot make a suggestion at this time."}, safe=False)
+
+    gameState = player.game.getGameState()
+        
+    return JsonResponse(gameState, safe=False)
 
 
 #checks other player's cards for the ability to disprove a suggestion

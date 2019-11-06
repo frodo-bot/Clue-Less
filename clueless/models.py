@@ -21,6 +21,10 @@ class Accusation(models.Model):
     user = models.CharField(max_length=150)
     text = models.CharField(max_length=500)
 
+class Notification(models.Model):
+    content = models.CharField(max_length=500)
+
+
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     game = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name="game_player_is_in", null=True)
@@ -177,12 +181,14 @@ class Game(models.Model):
 
     #returns the current game state as a JSON object
     def getGameState(self):
+        latest = Notification.objects.order_by("-pk")[0]
         state = {
             'status': self.status,
             'currentCharacter': '',
             'currentPlayer': '',
             'name': self.name,
             'board': json.loads(self.board.getBoardState()),
+            'notification': latest.content,
         }
 
         if self.currentPlayer:
