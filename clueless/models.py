@@ -23,6 +23,7 @@ class Accusation(models.Model):
 
 class Notification(models.Model):
     content = models.CharField(max_length=500)
+    game = models.ForeignKey('Game', on_delete=models.CASCADE, null=True)
 
 
 class Player(models.Model):
@@ -181,7 +182,7 @@ class Game(models.Model):
 
     #returns the current game state as a JSON object
     def getGameState(self):
-        latest = Notification.objects.order_by("-pk")[0]
+        latest = Notification.objects.filter(game=self).order_by("-pk")[0]
         state = {
             'status': self.status,
             'currentCharacter': '',
