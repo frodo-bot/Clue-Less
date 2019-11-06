@@ -1,0 +1,59 @@
+<!-- cluelesstemplates/lobby.html -->
+{% extends 'base.html' %}
+
+{% block title %}Clue-Less{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  <h1>Clue-Less Lobby</h1>
+  <a href="{% url 'lobby-leave' %}">Leave Lobby</a>
+  <br /><br />
+  <button id="create-button" disabled>Create Game</button>
+  <br />
+  <h2>Players:</h2>
+
+  <ul id="player-list"></ul>
+
+  <script>
+      $(document).ready( function() {
+          var players = [];
+
+          getPlayers();
+
+          $("#create-button").click(function() {
+              $.post("{% url 'creategame' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", players: players,
+                name: "main-game"})
+                .done(function(data) {
+                  console.log(data);
+                });
+          });
+
+          function getPlayers() {
+              $.get("{% url 'lobby-players' %}", {}, function(data) {
+                  if (data.status == "in game") {
+                    location.replace("{% url 'play-game' %}")
+                  }
+                  players = data.players;
+                  var playerList = "";
+                  data.players.forEach(function(item) {
+                    playerList += "<li>" + item + "</li>";
+                  });
+                  $("#player-list").html(playerList);
+
+                  if (data.players.length < 3) {
+                    $("#create-button").attr("disabled", true);
+                  } else {
+                    $("#create-button").attr("disabled", false);
+                  }
+
+              });
+              setTimeout(getPlayers, 1000);
+          }
+      });
+  </script>
+{% else %}
+  <script>
+      location.replace("{% url 'index' %}")
+  </script>
+{% endif %}
+{% endblock %}
