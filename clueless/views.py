@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
-from .models import Accusation, Suggestion, Player, Game
+from .models import Accusation, Suggestion, Player, Game, Card
 from django.contrib.auth.models import User
 
 #displays main page
@@ -112,7 +112,7 @@ def moveToRoom(request):
             notif = Notification(content=message, game=player.game)
             notif.save()
 
-        gameState = player.game.getGameState()
+    gameState = player.game.getGameState()
         
     return JsonResponse(gameState, safe=False)
 
@@ -131,7 +131,7 @@ def moveToHallway(request):
             notif = Notification(content=message, game=player.game)
             notif.save()
 
-        gameState = player.game.getGameState()
+    gameState = player.game.getGameState()
         
     return JsonResponse(gameState, safe=False)
 
@@ -184,11 +184,46 @@ def makeSuggestion(request):
 
 
 #checks other player's cards for the ability to disprove a suggestion
+#call this from the client that made the suggestion
 def disproveSuggestion(request):
-    return
+    if request.method == 'POST':
+        name = request.user.username
+        suggPlayer = Player.objects.filter(user__username=name)[0]
+        game = suggPlayer.game
+        disprovePlayer = game.getNextPlayer()
+        character = request.POST.get('character', '')
+        weapon = request.POST.get('weapon', '')
+        room = request.POST.get('room', '')
 
+        disproved = False
+        while disprovePlayer != suggPlayer:
+            queryset = Card.objects.filter(owner=disprovePlayer, game=game)
+            player_cards = []
+            for item in queryset:
+                player_cards.append(item)
+            
+            matches = game.checkSuggestion(player_cards, [character, weapon, room])
+            message = ""
+            if len(matches) > 0:
+                message = disprovePlayer.user.username + " disproved " + name + "'s suggestion."
+                notif = Notification(content=message, game=player.game)
+                notif.save()
+                game.specialMessage = disprovePlayer.user.username + " disproved your suggestion with the "  + matches[0].name + "card."
+                game.save()
+                disproved = True
+            else:
+                disprovePlayer = game.getNextPlayer()
 
+    if disproved == False:
+        message = "No one could disprove " + name + "'s suggestion."
+        notif = Notification(content=message, game=player.game)
+        notif.save()
 
+    gameState = player.game.getGameState()
+        
+    return JsonResponse(gameState, safe=False)
+            
+            
 #reponds to HTTP requests for making an accusation
 def makeAccusation(request):
     if request.method == 'POST':
@@ -221,6 +256,7 @@ def endTurn(request):
     game = Game.objects.filter(currentPlayer=player)[0]
     next_p = game.getNextPlayer()
     game.currentPlayer = next_p
+    game.specialMessage = ""
     game.save()
 
     message = player.user.username + "ended their turn. It is now " + next_p.user.username + "'s turn."

@@ -88,6 +88,7 @@ class Game(models.Model):
     name = models.CharField(max_length=50)
     currentPlayer = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name="current_player_turn", null=True)
     board = models.OneToOneField('Board', on_delete=models.DO_NOTHING, null=True)
+    specialMessage = models.CharField(max_length=500, default="") #message that only the current player will be able to see
 
     #initializes the game state by assigning the players to the game creating the board, rooms,
     #   and hallways, assigns a character to each player, and sets game status to "not started"
@@ -182,20 +183,23 @@ class Game(models.Model):
 
     #returns the current game state as a JSON object
     def getGameState(self):
-        latest = Notification.objects.filter(game=self).order_by("-pk")[0]
+        latest = Notification.objects.filter(game=self).order_by("-pk")
         state = {
             'status': self.status,
             'currentCharacter': '',
             'currentPlayer': '',
             'name': self.name,
             'board': json.loads(self.board.getBoardState()),
-            'notification': latest.content,
+            'specialMessage': self.specialMessage,
         }
 
         if self.currentPlayer:
             state['currentCharacter'] = self.currentPlayer.character
             state['currentPlayer'] = self.currentPlayer.user.username
             
+        if latest:
+            state['notification']: latest.content
+
         return json.dumps(state)
 
     #checks whether an accusation is correct against the case file stored in the game object. If
