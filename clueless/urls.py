@@ -19,4 +19,5 @@ urlpatterns = [
     path('moveroom/', views.moveToRoom, name='moveroom'),
     path('movehall/', views.moveToHallway, name='movehall'),
     path('endturn/', views.endTurn, name='endturn'),
+    path('disprove/', views.disproveSuggestion, name='disprove'),
 ]
