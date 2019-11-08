@@ -158,7 +158,8 @@
 
       function getGameState() {
         $.get("{% url 'game' %}", {}, function(data) {
-          console.log(data);
+          data = JSON.parse(data);
+          updateBoard(data.board);
         });
         setTimeout(getGameState, 2000);
       }
@@ -166,6 +167,69 @@
       function getPlayers() {
         // TODO: Get list of players in game and display username - character
         //  Put the result into player-list
+      }
+
+      function updateBoard(board) {
+        var hallways = board.hallways;
+        var rooms = board.rooms;
+        for (var i = 0; i < hallways.length; i++) {
+          var key = Object.keys(hallways[i])[0];
+          var id = getIdForBoard(key);
+          var playerList = hallways[i][key];
+          $("#" + id).html(playerList.join("<br/>"));
+        }
+        for (var i = 0; i < rooms.length; i++) {
+          var key = Object.keys(rooms[i])[0];
+          var id = getIdForBoard(key);
+          var playerList = rooms[i][key];
+          $("#" + id).html(playerList.join("<br/>"));
+        }
+      }
+
+      function getIdForBoard(name) {
+        if (name == "Study") {
+          return "study-players";
+        } else if (name == "Study - Hall") {
+            return "study-hall-players";
+        } else if (name == "Hall") {
+            return "hall-players";
+        } else if (name == "Hall - Lounge") {
+            return "hall-lounge-players";
+        } else if (name == "Lounge") {
+            return "lounge-players";
+        } else if (name == "Study - Library") {
+            return "study-library-players";
+        } else if (name == "Hall - Billiard Room") {
+            return "hall-billiard-players";
+        } else if (name == "Lounge - Dining Room") {
+            return "lounge-dining-players";
+        } else if (name == "Library") {
+            return "library-players";
+        } else if (name == "Library - Billiard Room") {
+            return "library-billiard-players";
+        } else if (name == "Billiard Room") {
+            return "billiard-players";
+        } else if (name == "Billiard Room - Dining Room") {
+            return "billiard-dining-players";
+        } else if (name == "Dining Room") {
+            return "dining-players";
+        } else if (name == "Library - Conservatory") {
+            return "library-conservatory-players";
+        } else if (name == "Billiard Room - Ballroom") {
+            return "billiard-ballroom-players";
+        } else if (name == "Dining Room - Kitchen") {
+            return "dining-kitchen-players";
+        } else if (name == "Conservatory") {
+            return "conservatory-players";
+        } else if (name == "Conservatory - Ballroom") {
+            return "conservatory-ballroom-players";
+        } else if (name == "Ballroom") {
+            return "ballroom-players";
+        } else if (name == "Ballroom - Kitchen") {
+            return "ballroom-kitchen-players";
+        } else if (name == "Kitchen") {
+            return "kitchen-players";
+        }
       }
   });
   </script>
