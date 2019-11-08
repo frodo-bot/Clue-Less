@@ -36,32 +36,80 @@
         </td>
       </tr>
       <tr>
-        <td>Study - Library</td>
+        <td>
+            <b>Study - Library</b>
+            <p id="study-library-players"></p>
+        </td>
         <td></td>
-        <td>Hall - Billiard Room</td>
+        <td>
+            <b>Hall - Billiard Room</b>
+            <p id="hall-billiard-players"></p>
+        </td>
         <td></td>
-        <td>Lounge - Dining Room</td>
+        <td>
+            <b>Lounge - Dining Room</b>
+            <p id="lounge-dining-players"></p>
+        </td>
       </tr>
       <tr>
-        <td>Library</td>
-        <td>Library - Billiard Room</td>
-        <td>Billiard Room</td>
-        <td>Billiard Room - Dining Room</td>
-        <td>Dining Room</td>
+        <td>
+            <b>Library</b>
+            <p id="library-players"></p>
+        </td>
+        <td>
+            <b>Library - Billiard Room</b>
+            <p id="library-billiard-players"></p>
+        </td>
+        <td>
+            <b>Billiard Room</b>
+            <p id="billiard-players"></p>
+        </td>
+        <td>
+            <b>Billiard Room - Dining Room</b>
+            <p id="billiard-dining-players"></p>
+        </td>
+        <td>
+            <b>Dining Room</b>
+            <p id="dining-players"></p>
+        </td>
       </tr>
       <tr>
-        <td>Library - Conservatory</td>
+        <td>
+            <b>Library - Conservatory</b>
+            <p id="library-conservatory-players"></p>
+        </td>
         <td></td>
-        <td>Billiard Room - Ballroom</td>
+        <td>
+            <b>Billiard Room - Ballroom</b>
+            <p id="billiard-ballroom-players"></p>
+        </td>
         <td></td>
-        <td>Dining Room - Kitchen</td>
+        <td>
+            <b>Dining Room - Kitchen</b>
+            <p id="dining-kitchen-players"></p>
+        </td>
       </tr>
       <tr>
-        <td>Conservatory</td>
-        <td>Conservatory - Ballroom</td>
-        <td>Ballroom</td>
-        <td>Ballroom - Kitchen</td>
-        <td>Kitchen</td>
+        <td>
+            <b>Conservatory</b>
+            <p id="conservatory-players"></p>
+        </td>
+        <td>
+            <b>Conservatory - Ballroom</b>
+            <p id="conservatory-ballroom-players"></p>
+        </td>
+        <td>
+            <b>Ballroom</b>
+            <p id="ballroom-players"></p>
+        </td>
+        <td>
+            <b>Ballroom - Kitchen</b>
+            <p id="ballroom-kitchen-players"></p>
+        </td>
+        <td>
+            <b>Kitchen</b>
+            <p id="kitchen-players"></p>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -110,7 +158,8 @@
 
       function getGameState() {
         $.get("{% url 'game' %}", {}, function(data) {
-          console.log(data);
+          data = JSON.parse(data);
+          updateBoard(data.board);
         });
         setTimeout(getGameState, 2000);
       }
@@ -118,6 +167,69 @@
       function getPlayers() {
         // TODO: Get list of players in game and display username - character
         //  Put the result into player-list
+      }
+
+      function updateBoard(board) {
+        var hallways = board.hallways;
+        var rooms = board.rooms;
+        for (var i = 0; i < hallways.length; i++) {
+          var key = Object.keys(hallways[i])[0];
+          var id = getIdForBoard(key);
+          var playerList = hallways[i][key];
+          $("#" + id).html(playerList.join("<br/>"));
+        }
+        for (var i = 0; i < rooms.length; i++) {
+          var key = Object.keys(rooms[i])[0];
+          var id = getIdForBoard(key);
+          var playerList = rooms[i][key];
+          $("#" + id).html(playerList.join("<br/>"));
+        }
+      }
+
+      function getIdForBoard(name) {
+        if (name == "Study") {
+          return "study-players";
+        } else if (name == "Study - Hall") {
+            return "study-hall-players";
+        } else if (name == "Hall") {
+            return "hall-players";
+        } else if (name == "Hall - Lounge") {
+            return "hall-lounge-players";
+        } else if (name == "Lounge") {
+            return "lounge-players";
+        } else if (name == "Study - Library") {
+            return "study-library-players";
+        } else if (name == "Hall - Billiard Room") {
+            return "hall-billiard-players";
+        } else if (name == "Lounge - Dining Room") {
+            return "lounge-dining-players";
+        } else if (name == "Library") {
+            return "library-players";
+        } else if (name == "Library - Billiard Room") {
+            return "library-billiard-players";
+        } else if (name == "Billiard Room") {
+            return "billiard-players";
+        } else if (name == "Billiard Room - Dining Room") {
+            return "billiard-dining-players";
+        } else if (name == "Dining Room") {
+            return "dining-players";
+        } else if (name == "Library - Conservatory") {
+            return "library-conservatory-players";
+        } else if (name == "Billiard Room - Ballroom") {
+            return "billiard-ballroom-players";
+        } else if (name == "Dining Room - Kitchen") {
+            return "dining-kitchen-players";
+        } else if (name == "Conservatory") {
+            return "conservatory-players";
+        } else if (name == "Conservatory - Ballroom") {
+            return "conservatory-ballroom-players";
+        } else if (name == "Ballroom") {
+            return "ballroom-players";
+        } else if (name == "Ballroom - Kitchen") {
+            return "ballroom-kitchen-players";
+        } else if (name == "Kitchen") {
+            return "kitchen-players";
+        }
       }
   });
   </script>

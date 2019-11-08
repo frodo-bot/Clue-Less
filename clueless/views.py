@@ -109,15 +109,13 @@ def moveToRoom(request):
         if room in player.getValidMoves():
             player.game.board.movePlayerToRoom(player, room)
             message = name + " (" + player.character + ") " + "moved to the " + room
-        else:
-            message = name + " (" + player.character + ") " + "tried to move to the " + room + ", which is an invalid move"
+            notif = Notification(content=message, game=player.game)
+            notif.save()
 
-        gameState = json.loads(player.game.getGameState())
-        gameState["message"] = message
-        gameState["messageFor"] = "all"
-        gameState = json.dumps(gameState)
-
+        gameState = player.game.getGameState()
+        
     return JsonResponse(gameState, safe=False)
+
 
 #will check hallway against valid moves, and then move the player there. Will return success or failure
 #   message with game state
@@ -130,15 +128,13 @@ def moveToHallway(request):
         if hallway in player.getValidMoves():
             player.game.board.movePlayerToHallway(player, hallway)
             message = name + " (" + player.character + ") " + "moved to the " + hallway + " hallway"
-        else:
-            message = name + " (" + player.character + ") " + "tried to move to the " + hallway + " hallway, which is an invalid move"
+            notif = Notification(content=message, game=player.game)
+            notif.save()
 
-        gameState = json.loads(player.game.getGameState())
-        gameState["message"] = message
-        gameState["messageFor"] = "all"
-        gameState = json.dumps(gameState)
-
+        gameState = player.game.getGameState()
+        
     return JsonResponse(gameState, safe=False)
+
 
 #return the valid moves in a JSON in the format {"rooms": <list of valid rooms>, "hallways":<list of valid hallways>}
 def validMoves(request):
@@ -159,7 +155,32 @@ def validMoves(request):
 
 #responds to HTTP request for making a suggestion
 def makeSuggestion(request):
-    return
+    if request.method == 'POST':
+        name = request.user.username
+        player = Player.objects.filter(user__username=name)[0]
+        character = request.POST.get('character', '')
+        weapon = request.POST.get('weapon', '')
+        room = request.POST.get('room', '')
+
+        message = ""
+        if "Make Suggestion" in player.getValidActions():
+            if room == player.currentRoom.name:
+                suggPlayer = Player.objects.filter(game=player.game, character=character)
+                if suggPlayer.currentRoom.name != room:
+                    suggPlayer.game.board.movePlayerToRoom(suggPlayer, room)
+                    message = name + " suggested that the crime was committed in the " + room + " by " + character + " with the " + weapon + ". " + character + " has been moved to the " + room + " for this suggestion."
+                else:
+                    message = name + " suggested that the crime was committed in the " + room + " by " + character + " with the " + weapon + ". "
+                notif = Notification(content=message, game=player.game)
+                notif.save()
+            else:
+                return JsonResponse({"error": "You must be in the room that you want to make a suggestion for."}, safe=False)
+        else:
+            return JsonResponse({"error": "You cannot make a suggestion at this time."}, safe=False)
+
+    gameState = player.game.getGameState()
+        
+    return JsonResponse(gameState, safe=False)
 
 
 #checks other player's cards for the ability to disprove a suggestion
@@ -170,7 +191,29 @@ def disproveSuggestion(request):
 
 #reponds to HTTP requests for making an accusation
 def makeAccusation(request):
-    return
+    if request.method == 'POST':
+        name = request.user.username
+        player = Player.objects.filter(user__username=name)[0]
+        character = request.POST.get('character', '')
+        weapon = request.POST.get('weapon', '')
+        room = request.POST.get('room', '')
+        
+        message = ""
+        if "Make Accusation" in player.getValidActions():
+            message = name + " accused " + character + " of committing the crime in the " + room + " with the " + weapon + ". "
+            result = player.game.checkAccusation(character, weapon, room)
+            if result == True:
+                message += " This accusation is correct, " + name + " has won the game!"
+            else:
+                message += " This accusation is incorrect, " + name + " can no longer win the game."
+            notif = Notification(content=message, game=player.game)
+            notif.save()
+        else:
+            return JsonResponse({"error": "You cannot make an accusation at this time."}, safe=False)
+
+    gameState = player.game.getGameState()
+        
+    return JsonResponse(gameState, safe=False)
 
 #ends the current players turn and updates game's current player to be the next player
 def endTurn(request):
@@ -179,10 +222,14 @@ def endTurn(request):
     next_p = game.getNextPlayer()
     game.currentPlayer = next_p
     game.save()
-    response = {"message": player.user.username + "ended turn. It is now " + next_p.user.username + "'s turn.",
-                "messageFor": "all"
-                }
-    return JsonResponse(json.dumps(response), safe=False)
+
+    message = player.user.username + "ended their turn. It is now " + next_p.user.username + "'s turn."
+    notif = Notification(content=message, game=game)
+    notif.save()
+
+    gameState = player.game.getGameState()
+        
+    return JsonResponse(gameState, safe=False)
 
 
 #returns the game state to the polling client
