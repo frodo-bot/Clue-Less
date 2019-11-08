@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
-from .models import Accusation, Suggestion, Player, Game, Card
+from .models import Player, Game, Card, Notification
 from django.contrib.auth.models import User
 
 #displays main page
@@ -223,7 +223,7 @@ def disproveSuggestion(request):
         
     return JsonResponse(gameState, safe=False)
             
-            
+
 #reponds to HTTP requests for making an accusation
 def makeAccusation(request):
     if request.method == 'POST':
@@ -241,6 +241,8 @@ def makeAccusation(request):
                 message += " This accusation is correct, " + name + " has won the game!"
             else:
                 message += " This accusation is incorrect, " + name + " can no longer win the game."
+                player.status = "lost"
+                player.save()
             notif = Notification(content=message, game=player.game)
             notif.save()
         else:
@@ -271,7 +273,7 @@ def endTurn(request):
 #returns the game state to the polling client
 def gameState(request):
     player = Player.objects.filter(user__username=request.user.username)[0]
-    return JsonResponse(player.game.getGameState(), safe=False)
+    return JsonResponse(player.game.getGameState(player), safe=False)
 
 
 #clears the database (TEMPORARY for skeletal increment only)

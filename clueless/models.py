@@ -182,7 +182,7 @@ class Game(models.Model):
         self.save()
 
     #returns the current game state as a JSON object
-    def getGameState(self):
+    def getGameState(self, player):
         latest = Notification.objects.filter(game=self).order_by("-pk")
         state = {
             'status': self.status,
@@ -193,12 +193,26 @@ class Game(models.Model):
             'specialMessage': self.specialMessage,
         }
 
+        if latest:
+            state['notification'] = latest[0].content
+
         if self.currentPlayer:
+            move_list = player.getValidMoves()
+            moves = {
+                "rooms": [],
+                "hallways": [],
+            }
+            for move in move_list:
+                if "-" in move:
+                    moves["hallways"].append(move)
+                else:
+                    moves["rooms"].append(move)
+
             state['currentCharacter'] = self.currentPlayer.character
             state['currentPlayer'] = self.currentPlayer.user.username
+            state['validMoves'] = moves
+            state['validActions'] = player.getValidActions()
             
-        if latest:
-            state['notification']: latest.content
 
         return json.dumps(state)
 

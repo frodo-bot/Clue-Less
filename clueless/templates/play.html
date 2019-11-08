@@ -114,8 +114,13 @@
     </tbody>
   </table>
 
+  <h3>Notification</h3>
+  <p id="notification"></p>
+
+  <h3>Make Accusation</h3>
+
   <h4>Character:</h4>
-  <select id="character">
+  <select id="character-acc">
     <option value="Miss Scarlet">Miss Scarlet</option>
     <option value="Mrs. Peacock">Mrs. Peacock</option>
     <option value="Professor Plum">Professor Plum</option>
@@ -127,7 +132,7 @@
   <br/>
 
   <h4>Weapon:</h4>
-  <select id="weapon">
+  <select id="weapon-acc">
     <option value="Rope">Rope</option>
     <option value="Lead Pipe">Lead Pipe</option>
     <option value="Knife">Knife</option>
@@ -139,7 +144,7 @@
   <br/>
 
   <h4>Room:</h4>
-  <select id="room">
+  <select id="room-acc">
     <option value="Study">Study</option>
     <option value="Hall">Hall</option>
     <option value="Lounge">Lounge</option>
@@ -151,6 +156,9 @@
     <option value="Kitchen">Kitchen</option>
   </select>
 
+  <button id="accuse">Make Accusation</button>
+
+
   <script>
     $(document).ready( function() {
       getPlayers();
@@ -159,7 +167,7 @@
       function getGameState() {
         $.get("{% url 'game' %}", {}, function(data) {
           data = JSON.parse(data);
-          updateBoard(data.board);
+          updatePage(data);
         });
         setTimeout(getGameState, 2000);
       }
@@ -167,6 +175,24 @@
       function getPlayers() {
         // TODO: Get list of players in game and display username - character
         //  Put the result into player-list
+      }
+
+      function updatePage(data){
+        console.log(data)
+        showMessage(data.notification, "all");
+        updateBoard(data.board);
+        if (data.validActions.indexOf("Make Accusation") != -1) {
+          $("#character-acc").attr("disabled", false);
+          $("#weapon-acc").attr("disabled", false);
+          $("#room-acc").attr("disabled", false);
+          $("#accuse").attr("disabled", false);
+        }
+        else {
+          $("#character-acc").attr("disabled", true);
+          $("#weapon-acc").attr("disabled", true);
+          $("#room-acc").attr("disabled", true);
+          $("#accuse").attr("disabled", true);
+        }
       }
 
       function updateBoard(board) {
@@ -231,6 +257,32 @@
             return "kitchen-players";
         }
       }
+
+      function showMessage(message, audience) {
+        var newText = "";
+        if (audience === "all") {
+          newText = message + "<br/>";
+        }
+        else if (audience === "{{ user.username }}") {
+          newText = message + "<br/>";
+        }
+        else {
+          newText = $("#notification").text()
+        }
+        $("#notification").html(newText);
+      }
+
+      $("#accuse").click(function() {
+        var weapon = $('#weapon-acc :selected').text();
+        var room = $('#room-acc :selected').text();
+        var character = $('#character-acc :selected').text();
+        $.post("{% url 'accusation' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", name: "{{ user.username }}",
+          weapon: weapon, room: room, character: character})
+          .done(function(data) {
+            data = JSON.parse(data);
+            updatePage(data);
+          })
+      });
   });
   </script>
 {% else %}
