@@ -1,1 +1,29 @@
-* { color:blue; } /* test that CSS works */
+table td {
+  border: 5px solid black;
+  height: 100px;
+  width: 100px;
+}
+.board {
+  text-align: center;
+  vertical-align: center;
+  margin-left:25%;
+  margin-right:25%;
+}
+.room {
+  background: peru;
+}
+.hallway {
+  background: goldenrod;
+}
+.starting {
+  background: lawngreen;
+}
+.empty {
+  border: 0px;
+}
+
+/*TODO*/
+.options {
+  width: 100%;
+  overflow: hidden;
+}
