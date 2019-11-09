@@ -195,19 +195,12 @@
         $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
         updateBoard(data.board);
         if (data.currentPlayer == "{{ user.get_username }}") {
-          $("#rooms").attr("disabled", false);
-          $("#hallways").attr("disabled", false);
-          $("#move-room").attr("disabled", false);
-          $("#move-hallway").attr("disabled", false);
           if (!currentPlayerInit) {
             updateMovement(data.validMoves)
             currentPlayerInit = true;
           }
         } else {
-          $("#rooms").attr("disabled", true);
-          $("#hallways").attr("disabled", true);
-          $("#move-hallway").attr("disabled", true);
-          $("#move-room").attr("disabled", true);
+          updateMovement(data.validMoves)
           currentPlayerInit = false;
         }
         if (data.validActions.indexOf("Make Accusation") != -1) {
@@ -229,11 +222,25 @@
         validMoves.rooms.forEach(function(item) {
           roomList += "<option>" + item + "</option>";
         });
+        if (roomList.length == 0) {
+          $("#rooms").attr("disabled", true);
+          $("#move-room").attr("disabled", true);
+        } else {
+          $("#rooms").attr("disabled", false);
+          $("#move-room").attr("disabled", false);
+        }
         $("#rooms").html(roomList);
         var hallwayList = "";
         validMoves.hallways.forEach(function(item) {
           hallwayList += "<option>" + item + "</option>";
         });
+        if (hallwayList.length == 0) {
+          $("#hallways").attr("disabled", true);
+          $("#move-hallway").attr("disabled", true);
+        } else {
+          $("#hallways").attr("disabled", false);
+          $("#move-hallway").attr("disabled", false);
+        }
         $("#hallways").html(hallwayList);
       }
 
@@ -319,7 +326,6 @@
           .done(function(data) {
             data = JSON.parse(data);
             updatePage(data);
-            updateMovement(data.validMoves);
           })
       });
 
@@ -332,6 +338,7 @@
           .done(function(data) {
             data = JSON.parse(data);
             updatePage(data);
+            updateMovement(data.validMoves)
           })
       });
 
