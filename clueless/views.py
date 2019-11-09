@@ -155,6 +155,16 @@ def validMoves(request):
     return JsonResponse(json.dumps(moves), safe=False)
 
 
+#return the valid moves in a JSON in the format {"rooms": <list of valid rooms>, "hallways":<list of valid hallways>}
+def playerCards(request):
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    cards = Card.objects.filter(owner=player)
+    card_list = []
+    for card in cards:
+        card_list.append(card.name)
+
+    return JsonResponse({"cardList": card_list}, safe=False)
+
 #responds to HTTP request for making a suggestion
 def makeSuggestion(request):
     if request.method == 'POST':

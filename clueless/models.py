@@ -203,6 +203,8 @@ class Game(models.Model):
 
         if latest:
             state['notification'] = latest[0].content
+        else:
+            state['notification'] = " "
 
         if self.currentPlayer:
             move_list = player.getValidMoves()
@@ -220,6 +222,12 @@ class Game(models.Model):
             state['currentPlayer'] = self.currentPlayer.user.username
             state['validMoves'] = moves
             state['validActions'] = player.getValidActions()
+
+        players = Player.objects.filter(game=self)
+        state['board']['starting'] = []
+        for player in players:
+            if not player.inRoom() and player.currentHallway == None:
+                state['board']['starting'].append(player.character)
             
 
         return json.dumps(state)

@@ -20,4 +20,5 @@ urlpatterns = [
     path('movehall/', views.moveToHallway, name='movehall'),
     path('endturn/', views.endTurn, name='endturn'),
     path('disprove/', views.disproveSuggestion, name='disprove'),
+    path('playercards/', views.playerCards, name='playercards'),
 ]

@@ -152,6 +152,10 @@
 
   <div style="width: 100%; overflow: hidden;">
       <div style="width: 250px; float: left;"> 
+        <h3>Your Cards</h3>
+        <ul id="cards"></ul>
+      </div>
+      <div style="width: 250px; float: left;"> 
           <h3>Movement</h3>
           <select id="rooms"></select> <button id="move-room">Move to Room</button>
           <br/> <br/>
@@ -231,7 +235,22 @@
   <script>
     $(document).ready( function() {
       var currentPlayerInit = false;
+      var startingLocations = {
+        "Miss Scarlet": "scarlet-starting",
+        "Mrs. Peacock": "peacock-starting",
+        "Professor Plum": "plum-starting",
+        "Mr. Green": "green-starting",
+        "Colonel Mustard": "mustard-starting",
+        "Mrs. White": "white-starting"
+      }
+      startingIds = ["scarlet-starting", "peacock-starting", "plum-starting", "green-starting", "mustard-starting", "white-starting"]
 
+      $.get("{% url 'playercards' %}", {csrfmiddlewaretoken : "{{ csrf_token }}"})
+          .done(function(data) {
+            for (var i = 0; i < data.cardList.length; i++) {
+              $("#cards").append('<li>' + data.cardList[i] + "</li>")
+            }
+          })
 
       getPlayers();
       getGameState();
@@ -323,6 +342,7 @@
       function updateBoard(board) {
         var hallways = board.hallways;
         var rooms = board.rooms;
+        var starting = board.starting;
         for (var i = 0; i < hallways.length; i++) {
           var key = Object.keys(hallways[i])[0];
           var id = getIdForBoard(key);
@@ -334,6 +354,15 @@
           var id = getIdForBoard(key);
           var playerList = rooms[i][key];
           $("#" + id).html(playerList.join("<br/>"));
+        }
+        for (var i = 0; i < startingIds.length; i++) {
+          var id = startingIds[i];
+          $("#" + id).empty();
+        }
+        for (var i = 0; i < starting.length; i++) {
+          var key = starting[i];
+          var id = startingLocations[key];
+          $("#" + id).html(key);
         }
       }
 
