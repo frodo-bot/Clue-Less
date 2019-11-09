@@ -112,7 +112,7 @@ def moveToRoom(request):
             notif = Notification(content=message, game=player.game)
             notif.save()
 
-    gameState = player.game.getGameState()
+    gameState = player.game.getGameState(player)
         
     return JsonResponse(gameState, safe=False)
 
@@ -131,7 +131,7 @@ def moveToHallway(request):
             notif = Notification(content=message, game=player.game)
             notif.save()
 
-    gameState = player.game.getGameState()
+    gameState = player.game.getGameState(player)
         
     return JsonResponse(gameState, safe=False)
 
@@ -248,7 +248,7 @@ def makeAccusation(request):
         else:
             return JsonResponse({"error": "You cannot make an accusation at this time."}, safe=False)
 
-    gameState = player.game.getGameState()
+    gameState = player.game.getGameState(player)
         
     return JsonResponse(gameState, safe=False)
 
@@ -261,11 +261,11 @@ def endTurn(request):
     game.specialMessage = ""
     game.save()
 
-    message = player.user.username + "ended their turn. It is now " + next_p.user.username + "'s turn."
+    message = player.user.username + " ended their turn. It is now " + next_p.user.username + "'s turn."
     notif = Notification(content=message, game=game)
     notif.save()
 
-    gameState = player.game.getGameState()
+    gameState = player.game.getGameState(player)
         
     return JsonResponse(gameState, safe=False)
 
