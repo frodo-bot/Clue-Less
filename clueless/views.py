@@ -9,6 +9,7 @@ from django.views import generic
 from django.http import JsonResponse
 from .models import Player, Game, Card, Notification
 from django.contrib.auth.models import User
+from time import sleep
 
 #displays main page
 def index(request):
@@ -79,6 +80,7 @@ class signup(generic.CreateView):
 #this will create a new game using a list of usernames. NOTE: This assumes that a list of usernames
 #   is provided in the request in the field "players" and a name for the game is provided in the field "name"
 def createGame(request):
+    request_player = Player.objects.filter(user__username=request.user.username)[0]
     player_list = []
     for name in request.POST.getlist('players[]'):
         player = Player.objects.filter(user__username=name)[0]
@@ -90,13 +92,13 @@ def createGame(request):
     game.initialize(player_list)
     #create and start game together (TEMPORARY for minimal increment only)
     startGame(request)
-    return JsonResponse(game.getGameState(), safe=False)
+    return JsonResponse(game.getGameState(request_player), safe=False)
 
 #will use the requesting user to start the game
 def startGame(request):
     player = Player.objects.filter(user__username=request.user.username)[0]
     player.game.startGame()
-    return JsonResponse(player.game.getGameState(), safe=False)
+    return JsonResponse(player.game.getGameState(player), safe=False)
 
 #will check room against valid moves, and then move the player there. Will return success or failure
 #   message with game state
@@ -160,27 +162,29 @@ def makeSuggestion(request):
         player = Player.objects.filter(user__username=name)[0]
         character = request.POST.get('character', '')
         weapon = request.POST.get('weapon', '')
-        room = request.POST.get('room', '')
+        room = player.currentRoom
 
         message = ""
         if "Make Suggestion" in player.getValidActions():
-            if room == player.currentRoom.name:
-                suggPlayer = Player.objects.filter(game=player.game, character=character)
-                if suggPlayer.currentRoom.name != room:
-                    suggPlayer.game.board.movePlayerToRoom(suggPlayer, room)
-                    message = name + " suggested that the crime was committed in the " + room + " by " + character + " with the " + weapon + ". " + character + " has been moved to the " + room + " for this suggestion."
+            if room != None:
+                suggPlayer = Player.objects.filter(game=player.game, character=character)[0]
+                if not suggPlayer.inRoom() or suggPlayer.currentRoom.name != room.name:
+                    suggPlayer.game.board.movePlayerToRoom(suggPlayer, room.name)
+                    message = name + " suggested that the crime was committed in the " + room.name + " by " + character + " with the " + weapon + ". " + character + " has been moved to the " + room.name + " for this suggestion."
                 else:
-                    message = name + " suggested that the crime was committed in the " + room + " by " + character + " with the " + weapon + ". "
+                    message = name + " suggested that the crime was committed in the " + room.name + " by " + character + " with the " + weapon + ". "
                 notif = Notification(content=message, game=player.game)
                 notif.save()
+                player.hasMadeSuggestionInRoom = True
+                player.save()
             else:
                 return JsonResponse({"error": "You must be in the room that you want to make a suggestion for."}, safe=False)
         else:
             return JsonResponse({"error": "You cannot make a suggestion at this time."}, safe=False)
 
-    gameState = player.game.getGameState()
+    gameStateJson = disproveSuggestion(request)
         
-    return JsonResponse(gameState, safe=False)
+    return gameStateJson
 
 
 #checks other player's cards for the ability to disprove a suggestion
@@ -190,13 +194,17 @@ def disproveSuggestion(request):
         name = request.user.username
         suggPlayer = Player.objects.filter(user__username=name)[0]
         game = suggPlayer.game
-        disprovePlayer = game.getNextPlayer()
+        disprovePlayer = game.getNextPlayer(suggPlayer)
         character = request.POST.get('character', '')
         weapon = request.POST.get('weapon', '')
-        room = request.POST.get('room', '')
+        room = suggPlayer.currentRoom.name
+
+        sleep(5)
 
         disproved = False
         while disprovePlayer != suggPlayer:
+            print(suggPlayer.user.username)
+            print(disprovePlayer.user.username)
             queryset = Card.objects.filter(owner=disprovePlayer, game=game)
             player_cards = []
             for item in queryset:
@@ -206,20 +214,20 @@ def disproveSuggestion(request):
             message = ""
             if len(matches) > 0:
                 message = disprovePlayer.user.username + " disproved " + name + "'s suggestion."
-                notif = Notification(content=message, game=player.game)
+                notif = Notification(content=message, game=suggPlayer.game)
                 notif.save()
-                game.specialMessage = disprovePlayer.user.username + " disproved your suggestion with the "  + matches[0].name + "card."
+                game.specialMessage = disprovePlayer.user.username + " disproved your suggestion with the "  + matches[0] + " card."
                 game.save()
                 disproved = True
             else:
-                disprovePlayer = game.getNextPlayer()
+                disprovePlayer = game.getNextPlayer(disprovePlayer)
 
     if disproved == False:
         message = "No one could disprove " + name + "'s suggestion."
-        notif = Notification(content=message, game=player.game)
+        notif = Notification(content=message, game=suggPlayer.game)
         notif.save()
 
-    gameState = player.game.getGameState()
+    gameState = suggPlayer.game.getGameState(suggPlayer)
         
     return JsonResponse(gameState, safe=False)
             
@@ -256,7 +264,7 @@ def makeAccusation(request):
 def endTurn(request):
     player = Player.objects.filter(user__username=request.user.username)[0]
     game = Game.objects.filter(currentPlayer=player)[0]
-    next_p = game.getNextPlayer()
+    next_p = game.getNextPlayer(player)
     game.currentPlayer = next_p
     game.specialMessage = ""
     game.save()

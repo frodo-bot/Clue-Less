@@ -122,6 +122,37 @@
 
   <button id="end-turn">End Turn</button>
 
+  <h3>Movement</h3>
+  <select id="rooms"></select> <button id="move-room">Move to Room</button>
+  <br/> <br/>
+  <select id="hallways"></select> <button id="move-hallway">Move to Hallway</button>
+
+  <h3>Make Suggestion</h3>
+
+  <h4>Character:</h4>
+  <select id="character-sugg">
+    <option value="Miss Scarlet">Miss Scarlet</option>
+    <option value="Mrs. Peacock">Mrs. Peacock</option>
+    <option value="Professor Plum">Professor Plum</option>
+    <option value="Mr. Green">Mr. Green</option>
+    <option value="Colonel Mustard">Colonel Mustard</option>
+    <option value="Mrs. White">Mrs. White</option>
+  </select>
+
+  <br/>
+
+  <h4>Weapon:</h4>
+  <select id="weapon-sugg">
+    <option value="Rope">Rope</option>
+    <option value="Lead Pipe">Lead Pipe</option>
+    <option value="Knife">Knife</option>
+    <option value="Wrench">Wrench</option>
+    <option value="Candlestick">Candlestick</option>
+    <option value="Revolver">Revolver</option>
+  </select>
+
+  <button id="suggest">Make Suggestion</button>
+
   <h3>Make Accusation</h3>
 
   <h4>Character:</h4>
@@ -163,12 +194,6 @@
 
   <button id="accuse">Make Accusation</button>
 
-  <h3>Movement</h3>
-  <select id="rooms"></select> <button id="move-room">Move to Room</button>
-  <br/> <br/>
-  <select id="hallways"></select> <button id="move-hallway">Move to Hallway</button>
-
-
   <script>
     $(document).ready( function() {
       var currentPlayerInit = false;
@@ -192,17 +217,33 @@
       function updatePage(data){
         console.log(data);
         showMessage(data.notification, "all");
+        if (data.specialMessage.length > 0) {
+          showMessage(data.specialMessage, data.currentPlayer);
+        }
         $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
         updateBoard(data.board);
         if (data.currentPlayer == "{{ user.get_username }}") {
+          $("#end-turn").attr("disabled", false);
           if (!currentPlayerInit) {
             updateMovement(data.validMoves)
             currentPlayerInit = true;
           }
         } else {
+          $("#end-turn").attr("disabled", true);
           updateMovement(data.validMoves)
           currentPlayerInit = false;
         }
+        if (data.validActions.indexOf("Make Suggestion") != -1) {
+          $("#character-sugg").attr("disabled", false);
+          $("#weapon-sugg").attr("disabled", false);
+          $("#suggest").attr("disabled", false);
+        }
+        else {
+          $("#character-sugg").attr("disabled", true);
+          $("#weapon-sugg").attr("disabled", true);
+          $("#suggest").attr("disabled", true);
+        }
+
         if (data.validActions.indexOf("Make Accusation") != -1) {
           $("#character-acc").attr("disabled", false);
           $("#weapon-acc").attr("disabled", false);
@@ -335,6 +376,18 @@
         var character = $('#character-acc :selected').text();
         $.post("{% url 'accusation' %}", {csrfmiddlewaretoken : "{{ csrf_token }}",
           weapon: weapon, room: room, character: character})
+          .done(function(data) {
+            data = JSON.parse(data);
+            updatePage(data);
+            updateMovement(data.validMoves)
+          })
+      });
+
+      $("#suggest").click(function() {
+        var weapon = $('#weapon-sugg :selected').text();
+        var character = $('#character-sugg :selected').text();
+        $.post("{% url 'suggestion' %}", {csrfmiddlewaretoken : "{{ csrf_token }}",
+          weapon: weapon, character: character})
           .done(function(data) {
             data = JSON.parse(data);
             updatePage(data);
