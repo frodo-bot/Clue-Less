@@ -57,8 +57,11 @@ class Player(models.Model):
                     if self.currentRoom.hasSecretPassage:
                         move_list.append(SECRET_PASSAGES[self.currentRoom.name])
                 else:
-                    move_list.append(self.currentHallway.room1.name)
-                    move_list.append(self.currentHallway.room2.name)
+                    if self.currentHallway != None:
+                        move_list.append(self.currentHallway.room1.name)
+                        move_list.append(self.currentHallway.room2.name)
+                    else:
+                        move_list.append(STARTING_LOCATIONS[self.character])
 
         return move_list
 
@@ -70,7 +73,9 @@ class Player(models.Model):
                 if self.inRoom():
                     if not self.hasMadeSuggestionInRoom:
                         action_list.append("Make Suggestion")
-                action_list.append("Make Accusation")
+                        action_list.append("Make Accusation")
+                if self.currentHallway != None:
+                    action_list.append("Make Accusation")
         return action_list
 
     #returns a list of the cards that a player owns
@@ -117,10 +122,10 @@ class Game(models.Model):
                 player.save()
 
         #put the players in their starting locations
-        for char in CHARACTERS:
-            player = Player.objects.filter(game=self, character=char)[0]
-            player.currentHallway = Hallway.objects.filter(board=self.board, name=STARTING_LOCATIONS[char])[0]
-            player.save()
+        #for char in CHARACTERS:
+           # player = Player.objects.filter(game=self, character=char)[0]
+           # player.currentHallway = Hallway.objects.filter(board=self.board, name=STARTING_LOCATIONS[char])[0]
+           # player.save()
 
         self.save()
 
