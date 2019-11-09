@@ -266,9 +266,9 @@ class Game(models.Model):
         return unplayed_list
 
     #uses the character order to determine who next player is and returns it
-    def getNextPlayer(self):
+    def getNextPlayer(self, current):
         next_player = ""
-        currentCharacterPos = CHARACTERS.index(self.currentPlayer.character)
+        currentCharacterPos = CHARACTERS.index(current.character)
         if currentCharacterPos + 1 < len(CHARACTERS):
             next_player = Player.objects.filter(game=self, character=CHARACTERS[currentCharacterPos+1], unplayed=False)
             if not next_player:
