@@ -202,9 +202,7 @@ def disproveSuggestion(request):
         sleep(5)
 
         disproved = False
-        while disprovePlayer != suggPlayer:
-            print(suggPlayer.user.username)
-            print(disprovePlayer.user.username)
+        while disprovePlayer.user.username != suggPlayer.user.username:
             queryset = Card.objects.filter(owner=disprovePlayer, game=game)
             player_cards = []
             for item in queryset:
@@ -218,6 +216,7 @@ def disproveSuggestion(request):
                 notif.save()
                 game.specialMessage = disprovePlayer.user.username + " disproved your suggestion with the "  + matches[0] + " card."
                 game.save()
+                disprovePlayer = suggPlayer
                 disproved = True
             else:
                 disprovePlayer = game.getNextPlayer(disprovePlayer)
