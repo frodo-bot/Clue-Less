@@ -150,77 +150,83 @@
 
   <button id="end-turn">End Turn</button>
 
-  <h3>Movement</h3>
-  <select id="rooms"></select> <button id="move-room">Move to Room</button>
-  <br/> <br/>
-  <select id="hallways"></select> <button id="move-hallway">Move to Hallway</button>
+  <div style="width: 100%; overflow: hidden;">
+      <div style="width: 250px; float: left;"> 
+          <h3>Movement</h3>
+          <select id="rooms"></select> <button id="move-room">Move to Room</button>
+          <br/> <br/>
+          <select id="hallways"></select> <button id="move-hallway">Move to Hallway</button>
+      </div>
+      <div style="width: 250px; float: left;">
+          <h3>Make Suggestion</h3>
 
-  <h3>Make Suggestion</h3>
+          <h4>Character:</h4>
+          <select id="character-sugg">
+            <option value="Miss Scarlet">Miss Scarlet</option>
+            <option value="Mrs. Peacock">Mrs. Peacock</option>
+            <option value="Professor Plum">Professor Plum</option>
+            <option value="Mr. Green">Mr. Green</option>
+            <option value="Colonel Mustard">Colonel Mustard</option>
+            <option value="Mrs. White">Mrs. White</option>
+          </select>
+        
+          <br/>
+        
+          <h4>Weapon:</h4>
+          <select id="weapon-sugg">
+            <option value="Rope">Rope</option>
+            <option value="Lead Pipe">Lead Pipe</option>
+            <option value="Knife">Knife</option>
+            <option value="Wrench">Wrench</option>
+            <option value="Candlestick">Candlestick</option>
+            <option value="Revolver">Revolver</option>
+          </select>
+          <br/> <br/>
+          <button id="suggest">Make Suggestion</button>
+      </div>
+      <div style="width: 250px; float: left;">
+          <h3>Make Accusation</h3>
 
-  <h4>Character:</h4>
-  <select id="character-sugg">
-    <option value="Miss Scarlet">Miss Scarlet</option>
-    <option value="Mrs. Peacock">Mrs. Peacock</option>
-    <option value="Professor Plum">Professor Plum</option>
-    <option value="Mr. Green">Mr. Green</option>
-    <option value="Colonel Mustard">Colonel Mustard</option>
-    <option value="Mrs. White">Mrs. White</option>
-  </select>
-
-  <br/>
-
-  <h4>Weapon:</h4>
-  <select id="weapon-sugg">
-    <option value="Rope">Rope</option>
-    <option value="Lead Pipe">Lead Pipe</option>
-    <option value="Knife">Knife</option>
-    <option value="Wrench">Wrench</option>
-    <option value="Candlestick">Candlestick</option>
-    <option value="Revolver">Revolver</option>
-  </select>
-
-  <button id="suggest">Make Suggestion</button>
-
-  <h3>Make Accusation</h3>
-
-  <h4>Character:</h4>
-  <select id="character-acc">
-    <option value="Miss Scarlet">Miss Scarlet</option>
-    <option value="Mrs. Peacock">Mrs. Peacock</option>
-    <option value="Professor Plum">Professor Plum</option>
-    <option value="Mr. Green">Mr. Green</option>
-    <option value="Colonel Mustard">Colonel Mustard</option>
-    <option value="Mrs. White">Mrs. White</option>
-  </select>
-
-  <br/>
-
-  <h4>Weapon:</h4>
-  <select id="weapon-acc">
-    <option value="Rope">Rope</option>
-    <option value="Lead Pipe">Lead Pipe</option>
-    <option value="Knife">Knife</option>
-    <option value="Wrench">Wrench</option>
-    <option value="Candlestick">Candlestick</option>
-    <option value="Revolver">Revolver</option>
-  </select>
-
-  <br/>
-
-  <h4>Room:</h4>
-  <select id="room-acc">
-    <option value="Study">Study</option>
-    <option value="Hall">Hall</option>
-    <option value="Lounge">Lounge</option>
-    <option value="Library">Library</option>
-    <option value="Billiard Room">Billiard Room</option>
-    <option value="Dining Room">Dining Room</option>
-    <option value="Conservatory">Conservatory</option>
-    <option value="Ballroom">Ballroom</option>
-    <option value="Kitchen">Kitchen</option>
-  </select>
-
-  <button id="accuse">Make Accusation</button>
+          <h4>Character:</h4>
+          <select id="character-acc">
+            <option value="Miss Scarlet">Miss Scarlet</option>
+            <option value="Mrs. Peacock">Mrs. Peacock</option>
+            <option value="Professor Plum">Professor Plum</option>
+            <option value="Mr. Green">Mr. Green</option>
+            <option value="Colonel Mustard">Colonel Mustard</option>
+            <option value="Mrs. White">Mrs. White</option>
+          </select>
+        
+          <br/>
+        
+          <h4>Weapon:</h4>
+          <select id="weapon-acc">
+            <option value="Rope">Rope</option>
+            <option value="Lead Pipe">Lead Pipe</option>
+            <option value="Knife">Knife</option>
+            <option value="Wrench">Wrench</option>
+            <option value="Candlestick">Candlestick</option>
+            <option value="Revolver">Revolver</option>
+          </select>
+        
+          <br/>
+        
+          <h4>Room:</h4>
+          <select id="room-acc">
+            <option value="Study">Study</option>
+            <option value="Hall">Hall</option>
+            <option value="Lounge">Lounge</option>
+            <option value="Library">Library</option>
+            <option value="Billiard Room">Billiard Room</option>
+            <option value="Dining Room">Dining Room</option>
+            <option value="Conservatory">Conservatory</option>
+            <option value="Ballroom">Ballroom</option>
+            <option value="Kitchen">Kitchen</option>
+          </select>
+          <br/> <br/>
+          <button id="accuse">Make Accusation</button>
+      </div>
+  </div>
 
   <script>
     $(document).ready( function() {
