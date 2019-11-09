@@ -34,6 +34,7 @@ class Player(models.Model):
     currentRoom = models.ForeignKey('Room', on_delete=models.DO_NOTHING, null=True)
     currentHallway = models.ForeignKey('Hallway', on_delete=models.DO_NOTHING, null=True)
     movedBySuggestion = models.BooleanField(default=False)
+    hasMadeSuggestionThisTurn = models.BooleanField(default=False)
     hasMadeSuggestionInRoom = models.BooleanField(default=False)
     unplayed = models.BooleanField(default=False)
 
@@ -50,12 +51,13 @@ class Player(models.Model):
         if self.game.currentPlayer == self:
             if self.status != "lost":
                 if self.inRoom():
-                    queryset = Hallway.objects.filter(room1=self.currentRoom) | Hallway.objects.filter(room2=self.currentRoom)
-                    for hallway in queryset:
-                        if not hallway.isOccupied():
-                            move_list.append(hallway.name)
-                    if self.currentRoom.hasSecretPassage:
-                        move_list.append(SECRET_PASSAGES[self.currentRoom.name])
+                    if not self.hasMadeSuggestionThisTurn and (self.hasMadeSuggestionInRoom or self.movedBySuggestion):  
+                        queryset = Hallway.objects.filter(room1=self.currentRoom) | Hallway.objects.filter(room2=self.currentRoom)
+                        for hallway in queryset:
+                            if not hallway.isOccupied():
+                                move_list.append(hallway.name)
+                        if self.currentRoom.hasSecretPassage:
+                            move_list.append(SECRET_PASSAGES[self.currentRoom.name])
                 else:
                     if self.currentHallway != None:
                         move_list.append(self.currentHallway.room1.name)
@@ -71,9 +73,10 @@ class Player(models.Model):
         if self.game.currentPlayer == self:
             if self.status != "lost":
                 if self.inRoom():
-                    if not self.hasMadeSuggestionInRoom:
-                        action_list.append("Make Suggestion")
-                        action_list.append("Make Accusation")
+                    if not self.hasMadeSuggestionThisTurn:
+                        if not self.hasMadeSuggestionInRoom:
+                            action_list.append("Make Suggestion")
+                    action_list.append("Make Accusation")
                 if self.currentHallway != None:
                     action_list.append("Make Accusation")
         return action_list
@@ -333,6 +336,7 @@ class Board(models.Model):
         player.currentRoom = room
         player.currentHallway = None
         player.hasMadeSuggestionInRoom = False
+        player.movedBySuggestion = False
         player.save()
         return
 
@@ -342,6 +346,7 @@ class Board(models.Model):
         player.currentHallway = hallway
         player.currentRoom = None
         player.hasMadeSuggestionInRoom = False
+        player.movedBySuggestion = False
         player.save()
         return
 

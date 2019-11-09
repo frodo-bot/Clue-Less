@@ -171,10 +171,13 @@ def makeSuggestion(request):
                 if not suggPlayer.inRoom() or suggPlayer.currentRoom.name != room.name:
                     suggPlayer.game.board.movePlayerToRoom(suggPlayer, room.name)
                     message = name + " suggested that the crime was committed in the " + room.name + " by " + character + " with the " + weapon + ". " + character + " has been moved to the " + room.name + " for this suggestion."
+                    suggPlayer.movedBySuggestion = True
+                    suggPlayer.save()
                 else:
                     message = name + " suggested that the crime was committed in the " + room.name + " by " + character + " with the " + weapon + ". "
                 notif = Notification(content=message, game=player.game)
                 notif.save()
+                player.hasMadeSuggestionThisTurn = True
                 player.hasMadeSuggestionInRoom = True
                 player.save()
             else:
@@ -267,6 +270,9 @@ def endTurn(request):
     game.currentPlayer = next_p
     game.specialMessage = ""
     game.save()
+
+    next_p.hasMadeSuggestionThisTurn = False
+    next_p.save()
 
     message = player.user.username + " ended their turn. It is now " + next_p.user.username + "'s turn."
     notif = Notification(content=message, game=game)
