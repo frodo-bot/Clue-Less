@@ -36,6 +36,7 @@ class Player(models.Model):
     movedBySuggestion = models.BooleanField(default=False)
     hasMadeSuggestionThisTurn = models.BooleanField(default=False)
     hasMadeSuggestionInRoom = models.BooleanField(default=False)
+    hasMovedThisTurn = models.BooleanField(default=False)
     unplayed = models.BooleanField(default=False)
 
     #returns True if the player is currently in a room and False if they're in a hallway
@@ -50,20 +51,21 @@ class Player(models.Model):
         move_list = []
         if self.game.currentPlayer == self:
             if self.status != "lost":
-                if self.inRoom():
-                    if not self.hasMadeSuggestionThisTurn and (self.hasMadeSuggestionInRoom or self.movedBySuggestion):  
-                        queryset = Hallway.objects.filter(room1=self.currentRoom) | Hallway.objects.filter(room2=self.currentRoom)
-                        for hallway in queryset:
-                            if not hallway.isOccupied():
-                                move_list.append(hallway.name)
-                        if self.currentRoom.hasSecretPassage:
-                            move_list.append(SECRET_PASSAGES[self.currentRoom.name])
-                else:
-                    if self.currentHallway != None:
-                        move_list.append(self.currentHallway.room1.name)
-                        move_list.append(self.currentHallway.room2.name)
+                if not self.hasMovedThisTurn:
+                    if self.inRoom():
+                        if not self.hasMadeSuggestionThisTurn and (self.hasMadeSuggestionInRoom or self.movedBySuggestion):  
+                            queryset = Hallway.objects.filter(room1=self.currentRoom) | Hallway.objects.filter(room2=self.currentRoom)
+                            for hallway in queryset:
+                                if not hallway.isOccupied():
+                                    move_list.append(hallway.name)
+                            if self.currentRoom.hasSecretPassage:
+                                move_list.append(SECRET_PASSAGES[self.currentRoom.name])
                     else:
-                        move_list.append(STARTING_LOCATIONS[self.character])
+                        if self.currentHallway != None:
+                            move_list.append(self.currentHallway.room1.name)
+                            move_list.append(self.currentHallway.room2.name)
+                        else:
+                            move_list.append(STARTING_LOCATIONS[self.character])
 
         return move_list
 
@@ -345,6 +347,7 @@ class Board(models.Model):
         player.currentHallway = None
         player.hasMadeSuggestionInRoom = False
         player.movedBySuggestion = False
+        player.hasMovedThisTurn = True
         player.save()
         return
 
@@ -355,6 +358,7 @@ class Board(models.Model):
         player.currentRoom = None
         player.hasMadeSuggestionInRoom = False
         player.movedBySuggestion = False
+        player.hasMovedThisTurn = True
         player.save()
         return
 

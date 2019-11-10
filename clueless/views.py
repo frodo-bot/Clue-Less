@@ -282,6 +282,7 @@ def endTurn(request):
     game.save()
 
     next_p.hasMadeSuggestionThisTurn = False
+    next_p.hasMovedThisTurn = False
     next_p.save()
 
     message = player.user.username + " ended their turn. It is now " + next_p.user.username + "'s turn."
