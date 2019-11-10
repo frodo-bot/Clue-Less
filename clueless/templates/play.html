@@ -7,6 +7,8 @@
 {% if user.is_authenticated %}
   <h1>Play Game</h1>
 
+  <h3>Your Username - {{ user.username }}</h3>
+
   <h3>Player List</h3>
   <ul id="player-list"></ul>
 
@@ -264,8 +266,13 @@
       }
 
       function getPlayers() {
-        // TODO: Get list of players in game and display username - character
-        //  Put the result into player-list
+        $.get("{% url 'game-players' %}", {}, function(data) {
+          var playerList = "";
+          data.players.forEach(function(item) {
+            playerList += "<li>" + item + "</li>";
+          });
+          $("#player-list").html(playerList);
+        });
       }
 
       function updatePage(data){
