@@ -6,6 +6,9 @@
 {% block content %}
 {% if user.is_authenticated %}
   <h1>Clue-Less Lobby</h1>
+
+  <h3>Your Username - {{ user.username }}</h3>
+
   <a href="{% url 'lobby-leave' %}">Leave Lobby</a>
   <br /><br />
   <button id="create-button" disabled>Create Game</button>
