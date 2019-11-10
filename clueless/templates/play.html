@@ -10,6 +10,8 @@
   <h3>Player List</h3>
   <ul id="player-list"></ul>
 
+  <h3 id="player"></h3>
+
   <h3>Current Player</h3>
   <p id="current-player"></p>
 
@@ -245,6 +247,8 @@
       }
       startingIds = ["scarlet-starting", "peacock-starting", "plum-starting", "green-starting", "mustard-starting", "white-starting"]
 
+      $("#player").html("{{user.get_username}}" + " you are playing: ");
+
       $.get("{% url 'playercards' %}", {csrfmiddlewaretoken : "{{ csrf_token }}"})
           .done(function(data) {
             for (var i = 0; i < data.cardList.length; i++) {
@@ -264,8 +268,14 @@
       }
 
       function getPlayers() {
-        // TODO: Get list of players in game and display username - character
-        //  Put the result into player-list
+        $.get("{% url 'game-players' %}", {}, function(data) {
+          players = data.players;
+          var playerList = [];
+          $.each(players, function(i, item) {
+            playerList.push("<li>" + item + "</li>");
+          });
+          $("#player-list").append(playerList.join(''));
+        });
       }
 
       function updatePage(data){

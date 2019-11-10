@@ -70,6 +70,17 @@ def playGame(request):
             return redirect('/')
     return render(request, 'play.html',{})
 
+#returns the players currently in a given game and a status for the player making a request
+def getGamePlayers(request):
+    players = Player.objects.filter(status="in game")
+    game_state = {"players": [], "status": ""}
+    for player in players:
+        game_state["players"].append(player.user.username)
+    game_state["status"] = player.status
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    game_state["status"] = player.status
+    return JsonResponse(game_state)
+
 #shows the sign-up form
 class signup(generic.CreateView):
     form_class = UserCreationForm
