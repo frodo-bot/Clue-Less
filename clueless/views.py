@@ -72,7 +72,8 @@ def playGame(request):
 
 #returns the players currently in the game
 def getGamePlayers(request):
-    players = Player.objects.filter(status="in game")
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    players = Player.objects.filter(game=player.game, unplayed=False)
     game_players = {"players" : []}
     for player in players:
         if player.user:

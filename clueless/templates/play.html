@@ -284,6 +284,10 @@
         if (data.status == "won") {
           $("#end-game").show();
           $("#end-turn").attr("disabled", true);
+          $("#rooms").attr("disabled", true);
+          $("#move-room").attr("disabled", true);
+          $("#hallways").attr("disabled", true);
+          $("#move-hallway").attr("disabled", true);
           $("#character-sugg").attr("disabled", true);
           $("#weapon-sugg").attr("disabled", true);
           $("#suggest").attr("disabled", true);
