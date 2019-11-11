@@ -268,10 +268,19 @@ def makeAccusation(request):
             result = player.game.checkAccusation(character, weapon, room)
             if result == True:
                 message += " This accusation is correct, " + name + " has won the game!"
+                player.game.status = "won"
+                player.game.save()
             else:
-                message += " This accusation is incorrect, " + name + " can no longer win the game."
                 player.status = "lost"
                 player.save()
+                players_left = Player.objects.filter(game=player.game, unplayed=False, status="in game")
+                if players_left.count() == 1:
+                    win_name = players_left[0].user.username
+                    message += name + "'s accusation was incorrect. Since " + win_name + " is the only player left, they win the game!"
+                    player.game.status = "won"
+                    player.game.save()
+                else:
+                    message += " This accusation is incorrect, " + name + " can no longer win the game."
             notif = Notification(content=message, game=player.game)
             notif.save()
         else:
@@ -303,9 +312,31 @@ def endTurn(request):
     return JsonResponse(gameState, safe=False)
 
 
+def endGame(request):
+    player = Player.objects.filter(user__username=request.user.username)[0]
+    game = player.game
+    players_left = Player.objects.filter(game=game, unplayed=False)
+    if players_left.count() == 1:
+        game.endGame()
+        game.delete()
+
+    player.status = "not in game"
+    player.game = None
+    player.character = None
+    player.movedBySuggestion = False
+    player.hasMadeSuggestionInRoom = False
+    player.hasMadeSuggestionThisTurn = False
+    player.hasMovedThisTurn = False
+    player.save()
+
+    return redirect('/')
+
+
 #returns the game state to the polling client
 def gameState(request):
     player = Player.objects.filter(user__username=request.user.username)[0]
+    if player.game == None:
+        return JsonResponse({'status':'won'}, safe=False)
     return JsonResponse(player.game.getGameState(player), safe=False)
 
 

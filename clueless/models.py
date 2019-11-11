@@ -28,11 +28,11 @@ class Notification(models.Model):
 
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-    game = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name="game_player_is_in", null=True)
+    game = models.ForeignKey('Game', on_delete=models.SET_NULL, related_name="game_player_is_in", null=True)
     character = models.CharField(max_length=50, null=True)
     status = models.CharField(max_length=20)
-    currentRoom = models.ForeignKey('Room', on_delete=models.DO_NOTHING, null=True)
-    currentHallway = models.ForeignKey('Hallway', on_delete=models.DO_NOTHING, null=True)
+    currentRoom = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True)
+    currentHallway = models.ForeignKey('Hallway', on_delete=models.SET_NULL, null=True)
     movedBySuggestion = models.BooleanField(default=False)
     hasMadeSuggestionThisTurn = models.BooleanField(default=False)
     hasMadeSuggestionInRoom = models.BooleanField(default=False)
@@ -93,11 +93,11 @@ class Player(models.Model):
 
 
 class Game(models.Model):
-    solution = models.ForeignKey('CaseFile', on_delete=models.DO_NOTHING, null=True)
+    solution = models.ForeignKey('CaseFile', on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=20, null=True)
     name = models.CharField(max_length=50)
-    currentPlayer = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name="current_player_turn", null=True)
-    board = models.OneToOneField('Board', on_delete=models.DO_NOTHING, null=True)
+    currentPlayer = models.ForeignKey(Player, on_delete=models.SET_NULL, related_name="current_player_turn", null=True)
+    board = models.OneToOneField('Board', on_delete=models.SET_NULL, null=True)
     specialMessage = models.CharField(max_length=500, default="") #message that only the current player will be able to see
 
     #initializes the game state by assigning the players to the game creating the board, rooms,
@@ -260,19 +260,21 @@ class Game(models.Model):
 
     #ends the game by setting the winning player's status to "won" as well as setting the game's
     #   status to "won". Also deletes the unplayed character objects, board, casefile, and cards
-    def endGame(self, player):
-        currentPlayer.status = "won"
-        currentPlayer.save()
+    def endGame(self):
+        #currentPlayer.status = "won"
+        #currentPlayer.save()
 
         self.status = "won"
         self.save()
 
-        self.board.delete()
         self.solution.delete()
-        Player.objects.filter(game=self, unplayed=True).delete()
+        Notification.objects.filter(game=self).delete()
         Card.objects.filter(game=self).delete()
+        Hallway.objects.filter(board=self.board).delete()
+        Room.objects.filter(board=self.board).delete()
+        self.board.delete()
+        Player.objects.filter(game=self, unplayed=True).delete()
 
-        self.save()
 
     #returns a list of the Clue-Less characters that are not being played by Players (i.e. there
     #   are less than 6 players)
@@ -395,7 +397,7 @@ class Hallway(models.Model):
 class Card(models.Model):
     name = models.CharField(max_length=50)
     cardType = models.CharField(max_length=20)
-    owner = models.ForeignKey(Player, on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)
 
     #returns True if otherCard is equal to self, returns False otherwise

@@ -153,6 +153,7 @@
   <p id="notification"></p>
 
   <button id="end-turn">End Turn</button>
+  <a id="end-game" class="btn btn-info" href="{% url 'endgame' %}">End Game</a>
 
   <div style="width: 100%; overflow: hidden;">
       <div style="width: 250px; float: left;"> 
@@ -280,44 +281,58 @@
       function updatePage(data){
         console.log(data);
         showMessage(data.notification, "all");
-        if (data.specialMessage.length > 0) {
-          showMessage(data.specialMessage, data.currentPlayer);
-        }
-        $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
-        updateBoard(data.board);
-        if (data.currentPlayer == "{{ user.get_username }}") {
-          $("#end-turn").attr("disabled", false);
-          if (!currentPlayerInit) {
-            updateMovement(data.validMoves)
-            currentPlayerInit = true;
-          }
-        } else {
+        if (data.status == "won") {
+          $("#end-game").show();
           $("#end-turn").attr("disabled", true);
-          updateMovement(data.validMoves)
-          currentPlayerInit = false;
-        }
-        if (data.validActions.indexOf("Make Suggestion") != -1) {
-          $("#character-sugg").attr("disabled", false);
-          $("#weapon-sugg").attr("disabled", false);
-          $("#suggest").attr("disabled", false);
-        }
-        else {
           $("#character-sugg").attr("disabled", true);
           $("#weapon-sugg").attr("disabled", true);
           $("#suggest").attr("disabled", true);
-        }
-
-        if (data.validActions.indexOf("Make Accusation") != -1) {
-          $("#character-acc").attr("disabled", false);
-          $("#weapon-acc").attr("disabled", false);
-          $("#room-acc").attr("disabled", false);
-          $("#accuse").attr("disabled", false);
-        }
-        else {
           $("#character-acc").attr("disabled", true);
           $("#weapon-acc").attr("disabled", true);
           $("#room-acc").attr("disabled", true);
           $("#accuse").attr("disabled", true);
+        }
+        else {
+          $("#end-game").hide();
+          if (data.specialMessage.length > 0) {
+            showMessage(data.specialMessage, data.currentPlayer);
+          }
+          $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
+          updateBoard(data.board);
+          if (data.currentPlayer == "{{ user.get_username }}") {
+            $("#end-turn").attr("disabled", false);
+            if (!currentPlayerInit) {
+              updateMovement(data.validMoves)
+              currentPlayerInit = true;
+            }
+          } else {
+            $("#end-turn").attr("disabled", true);
+            updateMovement(data.validMoves)
+            currentPlayerInit = false;
+          }
+          if (data.validActions.indexOf("Make Suggestion") != -1) {
+            $("#character-sugg").attr("disabled", false);
+            $("#weapon-sugg").attr("disabled", false);
+            $("#suggest").attr("disabled", false);
+          }
+          else {
+            $("#character-sugg").attr("disabled", true);
+            $("#weapon-sugg").attr("disabled", true);
+            $("#suggest").attr("disabled", true);
+          }
+
+          if (data.validActions.indexOf("Make Accusation") != -1) {
+            $("#character-acc").attr("disabled", false);
+            $("#weapon-acc").attr("disabled", false);
+            $("#room-acc").attr("disabled", false);
+            $("#accuse").attr("disabled", false);
+          }
+          else {
+            $("#character-acc").attr("disabled", true);
+            $("#weapon-acc").attr("disabled", true);
+            $("#room-acc").attr("disabled", true);
+            $("#accuse").attr("disabled", true);
+          }
         }
       }
 
@@ -487,6 +502,7 @@
             updateMovement(data.validMoves);
           })
       });
+
   });
   </script>
 {% else %}
