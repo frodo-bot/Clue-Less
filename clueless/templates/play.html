@@ -5,7 +5,7 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-  <h1>Play Game</h1>
+  <h1 id="title">Play Game</h1>
 
   <h3>Your Username - {{ user.username }}</h3>
 
@@ -15,137 +15,139 @@
   <h3>Current Player</h3>
   <p id="current-player"></p>
 
-  <h3>Game Board</h3>
-  <table border="1">
+  <!--h3>Game Board</h3-->
+  <div class="board">
+  <table id="board">
     <tbody>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td id="scarlet-starting"></td>
-        <td></td>
-        <td></td>
+        <td class="empty"></td>
+        <td class="empty"></td>
+        <td class="empty"></td>
+        <td class="empty"></td>
+        <td id="scarlet-starting" class="starting"></td>
+        <td class="empty"></td>
+        <td class="empty"></td>
       </tr>
       <tr>
-        <td></td>
-        <td>
+        <td class="empty"></td>
+        <td class="room">
           <b>Study</b>
           <p id="study-players"></p>
         </td>
-        <td>
+        <td class="hallway">
           <b>Study - Hall</b>
           <p id="study-hall-players"></p>
         </td>
-        <td>
+        <td class="room">
           <b>Hall</b>
           <p id="hall-players"></p>
         </td>
-        <td>
+        <td class="hallway">
           <b>Hall - Lounge</b>
           <p id="hall-lounge-players"></p>
         </td>
-        <td>
+        <td class="room">
           <b>Lounge</b>
           <p id="lounge-players"></p>
         </td>
-        <td></td>
+        <td class="empty"></td>
       </tr>
       <tr>
-        <td id="plum-starting"></td>
-        <td>
+        <td id="plum-starting" class="starting"></td>
+        <td class="hallway">
             <b>Study - Library</b>
             <p id="study-library-players"></p>
         </td>
-        <td></td>
-        <td>
+        <td class="empty"></td>
+        <td class="hallway">
             <b>Hall - Billiard Room</b>
             <p id="hall-billiard-players"></p>
         </td>
-        <td></td>
-        <td>
+        <td class="empty"></td>
+        <td class="hallway">
             <b>Lounge - Dining Room</b>
             <p id="lounge-dining-players"></p>
         </td>
-        <td id="mustard-starting"></td>
+        <td id="mustard-starting" class="starting"></td>
       </tr>
       <tr>
-        <td></td>
-        <td>
+        <td class="empty"></td>
+        <td class="room">
             <b>Library</b>
             <p id="library-players"></p>
         </td>
-        <td>
+        <td class="hallway">
             <b>Library - Billiard Room</b>
             <p id="library-billiard-players"></p>
         </td>
-        <td>
+        <td class="room">
             <b>Billiard Room</b>
             <p id="billiard-players"></p>
         </td>
-        <td>
+        <td class="hallway">
             <b>Billiard Room - Dining Room</b>
             <p id="billiard-dining-players"></p>
         </td>
-        <td>
+        <td class="room">
             <b>Dining Room</b>
             <p id="dining-players"></p>
         </td>
-        <td></td>
+        <td class="empty"></td>
       </tr>
       <tr>
-        <td id="peacock-starting"></td>
-        <td>
+        <td id="peacock-starting" class="starting"></td>
+        <td class="hallway">
             <b>Library - Conservatory</b>
             <p id="library-conservatory-players"></p>
         </td>
-        <td></td>
-        <td>
+        <td class="empty"></td>
+        <td class="hallway">
             <b>Billiard Room - Ballroom</b>
             <p id="billiard-ballroom-players"></p>
         </td>
-        <td></td>
-        <td>
+        <td class="empty"></td>
+        <td class="hallway">
             <b>Dining Room - Kitchen</b>
             <p id="dining-kitchen-players"></p>
         </td>
-        <td></td>
+        <td class="empty"></td>
       </tr>
       <tr>
-        <td></td>
-        <td>
+        <td class="empty"></td>
+        <td class="room">
             <b>Conservatory</b>
             <p id="conservatory-players"></p>
         </td>
-        <td>
+        <td class="hallway">
             <b>Conservatory - Ballroom</b>
             <p id="conservatory-ballroom-players"></p>
         </td>
-        <td>
+        <td class="room">
             <b>Ballroom</b>
             <p id="ballroom-players"></p>
         </td>
-        <td>
+        <td class="hallway">
             <b>Ballroom - Kitchen</b>
             <p id="ballroom-kitchen-players"></p>
         </td>
-        <td>
+        <td class="room">
             <b>Kitchen</b>
             <p id="kitchen-players"></p>
         </td>
-        <td></td>
+        <td class="empty"></td>
       </tr>
       <tr>
-          <td></td>
-          <td></td>
-          <td id="green-starting"></td>
-          <td></td>
-          <td id="white-starting"></td>
-          <td></td>
-          <td></td>
+          <td class="empty"></td>
+          <td class="empty"></td>
+          <td id="green-starting" class="starting"></td>
+          <td class="empty"></td>
+          <td id="white-starting" class="starting"></td>
+          <td class="empty"></td>
+          <td class="empty"></td>
         </tr>
     </tbody>
   </table>
+  </div>
 
   <h3>Notification</h3>
   <p id="notification"></p>
