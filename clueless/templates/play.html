@@ -156,6 +156,10 @@
   <a id="end-game" class="btn btn-info" href="{% url 'endgame' %}">End Game</a>
 
   <div style="width: 100%; overflow: hidden;">
+      <div id="disprove-div" style="width: 250px; float: left;"> 
+        <h3>Disprove Suggestion</h3>
+        <select id="cards-disprove"></select> <button id="disprove-sugg">Disprove Suggestion</button> <button id="cannot-disprove">Forfeit Disprove</button>
+      </div>
       <div style="width: 250px; float: left;"> 
         <h3>Your Cards</h3>
         <ul id="cards"></ul>
@@ -240,6 +244,7 @@
   <script>
     $(document).ready( function() {
       var currentPlayerInit = false;
+      var disproveInit = false;
       var startingLocations = {
         "Miss Scarlet": "scarlet-starting",
         "Mrs. Peacock": "peacock-starting",
@@ -247,14 +252,18 @@
         "Mr. Green": "green-starting",
         "Colonel Mustard": "mustard-starting",
         "Mrs. White": "white-starting"
-      }
-      startingIds = ["scarlet-starting", "peacock-starting", "plum-starting", "green-starting", "mustard-starting", "white-starting"]
+      };
+      var startingIds = ["scarlet-starting", "peacock-starting", "plum-starting", "green-starting", "mustard-starting", "white-starting"];
+      var suggestPlayer = null;
+      var suggestion = []; 
+      var playerCards = [];
 
       $.get("{% url 'playercards' %}", {csrfmiddlewaretoken : "{{ csrf_token }}"})
           .done(function(data) {
             for (var i = 0; i < data.cardList.length; i++) {
               $("#cards").append('<li>' + data.cardList[i] + "</li>")
             }
+            playerCards = data.cardList;
           })
 
       getPlayers();
@@ -297,6 +306,30 @@
           $("#accuse").attr("disabled", true);
         }
         else {
+          if (data.disprovePlayer != "{{ user.get_username }}") {
+            $('#disprove-div').hide()
+          }
+          else {
+            var cards = "";
+            playerCards.forEach(function(item) {
+              if (data.currentSuggestion.indexOf(item) != -1) {
+                cards += "<option>" + item + "</option>";
+              }
+            });
+            if (!disproveInit) {
+              disproveInit = true;
+              $("#cards-disprove").html(cards);
+              if (cards.length == 0) {
+                $("#disprove-sugg").attr("disabled", true);
+                $("#cannot-disprove").attr("disabled", false);
+              }
+              else {
+                $("#disprove-sugg").attr("disabled", false);
+                $("#cannot-disprove").attr("disabled", true);
+              }
+              $('#disprove-div').show();
+            }
+          }
           $("#end-game").hide();
           if (data.specialMessage.length > 0) {
             showMessage(data.specialMessage, data.currentPlayer);
@@ -478,12 +511,38 @@
       $("#suggest").click(function() {
         var weapon = $('#weapon-sugg :selected').text();
         var character = $('#character-sugg :selected').text();
+        suggestPlayer = "{{ user.username }}";
         $.post("{% url 'suggestion' %}", {csrfmiddlewaretoken : "{{ csrf_token }}",
           weapon: weapon, character: character})
           .done(function(data) {
             data = JSON.parse(data);
             updatePage(data);
             updateMovement(data.validMoves)
+            suggestion = data.suggestion;
+            console.log(suggestPlayer);
+            console.log(suggestion);
+            console.log(data.disprovePlayer);
+          })
+      });
+
+      $("#disprove-sugg").click(function() {
+        var card = $('#cards-disprove :selected').text();
+        $.post("{% url 'disprove' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", card: card, forfeit: false})
+          .done(function(data) {
+            data = JSON.parse(data);
+            updatePage(data);
+            updateMovement(data.validMoves)
+            disproveInit = false;
+          })
+      });
+
+      $("#cannot-disprove").click(function() {
+        $.post("{% url 'disprove' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", card: "", forfeit: true})
+          .done(function(data) {
+            data = JSON.parse(data);
+            updatePage(data);
+            updateMovement(data.validMoves)
+            disproveInit = false;
           })
       });
 
