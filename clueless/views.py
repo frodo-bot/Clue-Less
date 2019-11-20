@@ -352,6 +352,8 @@ def makeAccusation(request):
                     message += " This accusation is incorrect, " + name + " can no longer win the game."
             notif = Notification(content=message, game=player.game)
             notif.save()
+            game.specialMessage = ""
+            game.save()
         else:
             return JsonResponse({"error": "You cannot make an accusation at this time."}, safe=False)
 

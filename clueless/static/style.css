@@ -1,5 +1,5 @@
 table td {
-  border: 5px solid black;
+  border: 4px solid black;
   height: 100px;
   width: 100px;
 }
@@ -14,12 +14,60 @@ table td {
 }
 .hallway {
   background: goldenrod;
+  background-image: url(hallway.jpeg); 
+  background-size:100% 100%;
 }
 .starting {
   background: lawngreen;
 }
 .empty {
   border: 0px;
+}
+
+
+#study {
+  background-image: url(study.jpeg); 
+  background-size:100% 100%;
+}
+
+#hall {
+  background-image: url(hall.jpeg); 
+  background-size:100% 100%;
+}
+
+#lounge {
+  background-image: url(lounge.jpeg); 
+  background-size:100% 100%;
+}
+
+#library {
+  background-image: url(library.jpeg); 
+  background-size:100% 100%;
+}
+
+#billiard {
+  background-image: url(billiard.jpeg); 
+  background-size:100% 100%;
+}
+
+#dining {
+  background-image: url(dining.jpeg); 
+  background-size:100% 100%;
+}
+
+#conservatory {
+  background-image: url(conservatory.jpeg); 
+  background-size:100% 100%;
+}
+
+#ballroom {
+  background-image: url(ballroom.jpeg); 
+  background-size:100% 100%;
+}
+
+#kitchen {
+  background-image: url(kitchen.jpeg); 
+  background-size:100% 100%;
 }
 
 /*TODO*/
