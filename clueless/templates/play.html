@@ -31,7 +31,6 @@
       <tr>
         <td class="empty"></td>
         <td  id="study" class="room">
-          <b>Study</b>
           <p id="study-players"></p>
         </td>
         <td class="hallway">
@@ -39,7 +38,6 @@
           <p id="study-hall-players"></p>
         </td>
         <td id="hall" class="room">
-          <b>Hall</b>
           <p id="hall-players"></p>
         </td>
         <td class="hallway">
@@ -47,7 +45,6 @@
           <p id="hall-lounge-players"></p>
         </td>
         <td id="lounge" class="room">
-          <b>Lounge</b>
           <p id="lounge-players"></p>
         </td>
         <td class="empty"></td>
@@ -73,7 +70,6 @@
       <tr>
         <td class="empty"></td>
         <td id="library" class="room">
-            <b>Library</b>
             <p id="library-players"></p>
         </td>
         <td class="hallway">
@@ -81,7 +77,6 @@
             <p id="library-billiard-players"></p>
         </td>
         <td id="billiard" class="room">
-            <b>Billiard Room</b>
             <p id="billiard-players"></p>
         </td>
         <td class="hallway">
@@ -89,7 +84,6 @@
             <p id="billiard-dining-players"></p>
         </td>
         <td id="dining" class="room">
-            <b>Dining Room</b>
             <p id="dining-players"></p>
         </td>
         <td class="empty"></td>
@@ -115,7 +109,6 @@
       <tr>
         <td class="empty"></td>
         <td id="conservatory" class="room">
-            <b>Conservatory</b>
             <p id="conservatory-players"></p>
         </td>
         <td class="hallway">
@@ -123,7 +116,6 @@
             <p id="conservatory-ballroom-players"></p>
         </td>
         <td id="ballroom" class="room">
-            <b>Ballroom</b>
             <p id="ballroom-players"></p>
         </td>
         <td class="hallway">
@@ -131,7 +123,6 @@
             <p id="ballroom-kitchen-players"></p>
         </td>
         <td id="kitchen" class="room">
-            <b>Kitchen</b>
             <p id="kitchen-players"></p>
         </td>
         <td class="empty"></td>
@@ -253,6 +244,14 @@
         "Colonel Mustard": "mustard-starting",
         "Mrs. White": "white-starting"
       };
+      var characterToPiece = {
+        "Miss Scarlet": "scarlet-piece",
+        "Mrs. Peacock": "peacock-piece",
+        "Professor Plum": "plum-piece",
+        "Mr. Green": "green-piece",
+        "Colonel Mustard": "mustard-piece",
+        "Mrs. White": "white-piece"
+      };
       var startingIds = ["scarlet-starting", "peacock-starting", "plum-starting", "green-starting", "mustard-starting", "white-starting"];
       var suggestPlayer = null;
       var suggestion = []; 
@@ -335,7 +334,7 @@
             showMessage(data.specialMessage, data.currentPlayer);
           }
           $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
-          updateBoard(data.board);
+          updateBoard(data.board, data.currentCharacter);
           if (data.currentPlayer == "{{ user.get_username }}") {
             $("#end-turn").attr("disabled", false);
             if (!currentPlayerInit) {
@@ -400,7 +399,7 @@
         $("#hallways").html(hallwayList);
       }
 
-      function updateBoard(board) {
+      function updateBoard(board, currentCharacter) {
         var hallways = board.hallways;
         var rooms = board.rooms;
         var starting = board.starting;
@@ -408,13 +407,27 @@
           var key = Object.keys(hallways[i])[0];
           var id = getIdForBoard(key);
           var playerList = hallways[i][key];
-          $("#" + id).html(playerList.join("<br/>"));
+          var final_html = "";
+          for (var j = 0; j < playerList.length; j++) {
+            final_html = final_html + getImageForCharacter(playerList[j], currentCharacter);
+            if (j == 2) {
+              final_html = final_html + "<br/>";
+            }
+          }
+          $("#" + id).html(final_html);
         }
         for (var i = 0; i < rooms.length; i++) {
           var key = Object.keys(rooms[i])[0];
           var id = getIdForBoard(key);
           var playerList = rooms[i][key];
-          $("#" + id).html(playerList.join("<br/>"));
+          var final_html = "";
+          for (var j = 0; j < playerList.length; j++) {
+            final_html = final_html + getImageForCharacter(playerList[j], currentCharacter);
+            if (j == 2) {
+              final_html = final_html + "<br/>";
+            }
+          }
+          $("#" + id).html(final_html);
         }
         for (var i = 0; i < startingIds.length; i++) {
           var id = startingIds[i];
@@ -423,7 +436,58 @@
         for (var i = 0; i < starting.length; i++) {
           var key = starting[i];
           var id = startingLocations[key];
-          $("#" + id).html(key);
+          $("#" + id).html(getImageForCharacter(key, currentCharacter));
+        }
+      }
+
+      function getImageForCharacter(character, currentCharacter) {
+        if (character == "Miss Scarlet") {
+          if (currentCharacter == "Miss Scarlet") {
+            return "<img src='../static/scarlet-piece.png' id='scarlet-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/scarlet-piece.png' id='scarlet-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Mrs. Peacock") {
+          if (currentCharacter == "Mrs. Peacock") {
+            return "<img src='../static/peacock-piece.png' id='peacock-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/peacock-piece.png' id='peacock-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Professor Plum") {
+          if (currentCharacter == "Professor Plum") {
+            return "<img src='../static/plum-piece.png' id='plum-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/plum-piece.png' id='plum-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Mr. Green") {
+          if (currentCharacter == "Mr. Green") {
+            return "<img src='../static/green-piece.png' id='green-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/green-piece.png' id='green-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Colonel Mustard") {
+          if (currentCharacter == "Colonel Mustard") {
+            return "<img src='../static/mustard-piece.png' id='mustard-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/mustard-piece.png' id='mustard-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Mrs. White") {
+          if (currentCharacter == "Mrs. White") {
+            return "<img src='../static/white-piece.png' id='white-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/white-piece.png' id='white-piece' class='pieces'>";
+          }
         }
       }
 
