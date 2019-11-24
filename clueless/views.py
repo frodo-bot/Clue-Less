@@ -183,6 +183,8 @@ def makeSuggestion(request):
         character = request.POST.get('character', '')
         weapon = request.POST.get('weapon', '')
         room = player.currentRoom
+        suggestion = [room.name, weapon, character]
+        game = player.game
 
         message = ""
         if "Make Suggestion" in player.getValidActions():
@@ -200,20 +202,86 @@ def makeSuggestion(request):
                 player.hasMadeSuggestionThisTurn = True
                 player.hasMadeSuggestionInRoom = True
                 player.save()
+                game.disprovePlayer = game.getNextPlayer(player).user.username
+                game.currentSuggestion = character + "," + room.name + "," + weapon
+                game.save()
             else:
                 return JsonResponse({"error": "You must be in the room that you want to make a suggestion for."}, safe=False)
         else:
             return JsonResponse({"error": "You cannot make a suggestion at this time."}, safe=False)
 
-    gameStateJson = disproveSuggestion(request)
-        
-    return gameStateJson
+    #gameStateJson = disproveSuggestion(request)
+    gameStateJson = game.getGameState(player)
+    return JsonResponse(gameStateJson, safe=False)
+
+
+def disproveSuggestion(request):
+    if request.method == 'POST':
+        name = request.user.username
+        disprovePlayer = Player.objects.filter(user__username=name)[0]
+        game = disprovePlayer.game
+        suggPlayer = game.currentPlayer
+        card = request.POST.get('card', '')
+        forfeit = request.POST.get('forfeit', '')
+
+        if forfeit == True:
+            if game.getNextPlayer(disprovePlayer).user.username == suggPlayer.user.username:
+                message = "No one could disprove " + suggPlayer.user.username + "'s suggestion."
+                notif = Notification(content=message, game=suggPlayer.game)
+                notif.save()
+                game.disprovePlayer = None
+                game.currentSuggestion = None
+                game.save()
+            else:
+                message = name + " could not disprove " + suggPlayer.user.username + "'s suggestion."
+                notif = Notification(content=message, game=suggPlayer.game)
+                notif.save()
+                game.disprovePlayer = game.getNextPlayer(disprovePlayer).user.username
+                game.save()
+
+            gameState = game.getGameState(suggPlayer)
+            return JsonResponse(gameState, safe=False)
+
+        queryset = Card.objects.filter(owner=disprovePlayer, game=game)
+        player_cards = []
+        for item in queryset:
+            player_cards.append(item)
+
+        matches = game.checkSuggestion(player_cards, game.currentSuggestion.split(","))
+        if card in matches:
+            message = name + " disproved " + suggPlayer.user.username + "'s suggestion."
+            notif = Notification(content=message, game=suggPlayer.game)
+            notif.save()
+            game.specialMessage = disprovePlayer.user.username + " disproved your suggestion with the "  + card + " card."
+            game.disprovePlayer = None
+            game.currentSuggestion = None
+            game.save()
+        else:
+            if game.getNextPlayer(disprovePlayer).user.username == suggPlayer.user.username:
+                message = "No one could disprove " + suggPlayer.user.username + "'s suggestion."
+                notif = Notification(content=message, game=suggPlayer.game)
+                notif.save()
+                game.disprovePlayer = None
+                game.currentSuggestion = None
+                game.save()
+            else:
+                message = name + " could not disprove " + suggPlayer.user.username + "'s suggestion."
+                notif = Notification(content=message, game=suggPlayer.game)
+                notif.save()
+                game.disprovePlayer = game.getNextPlayer(disprovePlayer).user.username
+                game.save()
+
+        gameState = game.getGameState(suggPlayer)
+        return JsonResponse(gameState, safe=False)
+
+
 
 
 #checks other player's cards for the ability to disprove a suggestion
 #call this from the client that made the suggestion
-def disproveSuggestion(request):
+""" def disproveSuggestion(request):
     if request.method == 'POST':
+        print("HELLO WORLD ", request.user.username)
         name = request.user.username
         suggPlayer = Player.objects.filter(user__username=name)[0]
         game = suggPlayer.game
@@ -252,7 +320,7 @@ def disproveSuggestion(request):
     gameState = suggPlayer.game.getGameState(suggPlayer)
         
     return JsonResponse(gameState, safe=False)
-            
+             """
 
 #reponds to HTTP requests for making an accusation
 def makeAccusation(request):
@@ -284,6 +352,8 @@ def makeAccusation(request):
                     message += " This accusation is incorrect, " + name + " can no longer win the game."
             notif = Notification(content=message, game=player.game)
             notif.save()
+            game.specialMessage = ""
+            game.save()
         else:
             return JsonResponse({"error": "You cannot make an accusation at this time."}, safe=False)
 

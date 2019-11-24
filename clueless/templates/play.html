@@ -30,24 +30,21 @@
       </tr>
       <tr>
         <td class="empty"></td>
-        <td class="room">
-          <b>Study</b>
+        <td  id="study" class="room">
           <p id="study-players"></p>
         </td>
         <td class="hallway">
           <b>Study - Hall</b>
           <p id="study-hall-players"></p>
         </td>
-        <td class="room">
-          <b>Hall</b>
+        <td id="hall" class="room">
           <p id="hall-players"></p>
         </td>
         <td class="hallway">
           <b>Hall - Lounge</b>
           <p id="hall-lounge-players"></p>
         </td>
-        <td class="room">
-          <b>Lounge</b>
+        <td id="lounge" class="room">
           <p id="lounge-players"></p>
         </td>
         <td class="empty"></td>
@@ -72,24 +69,21 @@
       </tr>
       <tr>
         <td class="empty"></td>
-        <td class="room">
-            <b>Library</b>
+        <td id="library" class="room">
             <p id="library-players"></p>
         </td>
         <td class="hallway">
             <b>Library - Billiard Room</b>
             <p id="library-billiard-players"></p>
         </td>
-        <td class="room">
-            <b>Billiard Room</b>
+        <td id="billiard" class="room">
             <p id="billiard-players"></p>
         </td>
         <td class="hallway">
             <b>Billiard Room - Dining Room</b>
             <p id="billiard-dining-players"></p>
         </td>
-        <td class="room">
-            <b>Dining Room</b>
+        <td id="dining" class="room">
             <p id="dining-players"></p>
         </td>
         <td class="empty"></td>
@@ -114,24 +108,21 @@
       </tr>
       <tr>
         <td class="empty"></td>
-        <td class="room">
-            <b>Conservatory</b>
+        <td id="conservatory" class="room">
             <p id="conservatory-players"></p>
         </td>
         <td class="hallway">
             <b>Conservatory - Ballroom</b>
             <p id="conservatory-ballroom-players"></p>
         </td>
-        <td class="room">
-            <b>Ballroom</b>
+        <td id="ballroom" class="room">
             <p id="ballroom-players"></p>
         </td>
         <td class="hallway">
             <b>Ballroom - Kitchen</b>
             <p id="ballroom-kitchen-players"></p>
         </td>
-        <td class="room">
-            <b>Kitchen</b>
+        <td id="kitchen" class="room">
             <p id="kitchen-players"></p>
         </td>
         <td class="empty"></td>
@@ -156,6 +147,10 @@
   <a id="end-game" class="btn btn-info" href="{% url 'endgame' %}">End Game</a>
 
   <div style="width: 100%; overflow: hidden;">
+      <div id="disprove-div" style="width: 250px; float: left;"> 
+        <h3>Disprove Suggestion</h3>
+        <select id="cards-disprove"></select> <button id="disprove-sugg">Disprove Suggestion</button> <button id="cannot-disprove">Forfeit Disprove</button>
+      </div>
       <div style="width: 250px; float: left;"> 
         <h3>Your Cards</h3>
         <ul id="cards"></ul>
@@ -240,6 +235,7 @@
   <script>
     $(document).ready( function() {
       var currentPlayerInit = false;
+      var disproveInit = false;
       var startingLocations = {
         "Miss Scarlet": "scarlet-starting",
         "Mrs. Peacock": "peacock-starting",
@@ -247,14 +243,26 @@
         "Mr. Green": "green-starting",
         "Colonel Mustard": "mustard-starting",
         "Mrs. White": "white-starting"
-      }
-      startingIds = ["scarlet-starting", "peacock-starting", "plum-starting", "green-starting", "mustard-starting", "white-starting"]
+      };
+      var characterToPiece = {
+        "Miss Scarlet": "scarlet-piece",
+        "Mrs. Peacock": "peacock-piece",
+        "Professor Plum": "plum-piece",
+        "Mr. Green": "green-piece",
+        "Colonel Mustard": "mustard-piece",
+        "Mrs. White": "white-piece"
+      };
+      var startingIds = ["scarlet-starting", "peacock-starting", "plum-starting", "green-starting", "mustard-starting", "white-starting"];
+      var suggestPlayer = null;
+      var suggestion = []; 
+      var playerCards = [];
 
       $.get("{% url 'playercards' %}", {csrfmiddlewaretoken : "{{ csrf_token }}"})
           .done(function(data) {
             for (var i = 0; i < data.cardList.length; i++) {
               $("#cards").append('<li>' + data.cardList[i] + "</li>")
             }
+            playerCards = data.cardList;
           })
 
       getPlayers();
@@ -297,12 +305,36 @@
           $("#accuse").attr("disabled", true);
         }
         else {
+          if (data.disprovePlayer != "{{ user.get_username }}") {
+            $('#disprove-div').hide()
+          }
+          else {
+            var cards = "";
+            playerCards.forEach(function(item) {
+              if (data.currentSuggestion.indexOf(item) != -1) {
+                cards += "<option>" + item + "</option>";
+              }
+            });
+            if (!disproveInit) {
+              disproveInit = true;
+              $("#cards-disprove").html(cards);
+              if (cards.length == 0) {
+                $("#disprove-sugg").attr("disabled", true);
+                $("#cannot-disprove").attr("disabled", false);
+              }
+              else {
+                $("#disprove-sugg").attr("disabled", false);
+                $("#cannot-disprove").attr("disabled", true);
+              }
+              $('#disprove-div').show();
+            }
+          }
           $("#end-game").hide();
           if (data.specialMessage.length > 0) {
             showMessage(data.specialMessage, data.currentPlayer);
           }
           $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
-          updateBoard(data.board);
+          updateBoard(data.board, data.currentCharacter);
           if (data.currentPlayer == "{{ user.get_username }}") {
             $("#end-turn").attr("disabled", false);
             if (!currentPlayerInit) {
@@ -367,7 +399,7 @@
         $("#hallways").html(hallwayList);
       }
 
-      function updateBoard(board) {
+      function updateBoard(board, currentCharacter) {
         var hallways = board.hallways;
         var rooms = board.rooms;
         var starting = board.starting;
@@ -375,13 +407,27 @@
           var key = Object.keys(hallways[i])[0];
           var id = getIdForBoard(key);
           var playerList = hallways[i][key];
-          $("#" + id).html(playerList.join("<br/>"));
+          var final_html = "";
+          for (var j = 0; j < playerList.length; j++) {
+            final_html = final_html + getImageForCharacter(playerList[j], currentCharacter);
+            if (j == 2) {
+              final_html = final_html + "<br/>";
+            }
+          }
+          $("#" + id).html(final_html);
         }
         for (var i = 0; i < rooms.length; i++) {
           var key = Object.keys(rooms[i])[0];
           var id = getIdForBoard(key);
           var playerList = rooms[i][key];
-          $("#" + id).html(playerList.join("<br/>"));
+          var final_html = "";
+          for (var j = 0; j < playerList.length; j++) {
+            final_html = final_html + getImageForCharacter(playerList[j], currentCharacter);
+            if (j == 2) {
+              final_html = final_html + "<br/>";
+            }
+          }
+          $("#" + id).html(final_html);
         }
         for (var i = 0; i < startingIds.length; i++) {
           var id = startingIds[i];
@@ -390,7 +436,58 @@
         for (var i = 0; i < starting.length; i++) {
           var key = starting[i];
           var id = startingLocations[key];
-          $("#" + id).html(key);
+          $("#" + id).html(getImageForCharacter(key, currentCharacter));
+        }
+      }
+
+      function getImageForCharacter(character, currentCharacter) {
+        if (character == "Miss Scarlet") {
+          if (currentCharacter == "Miss Scarlet") {
+            return "<img src='../static/scarlet-piece.png' id='scarlet-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/scarlet-piece.png' id='scarlet-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Mrs. Peacock") {
+          if (currentCharacter == "Mrs. Peacock") {
+            return "<img src='../static/peacock-piece.png' id='peacock-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/peacock-piece.png' id='peacock-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Professor Plum") {
+          if (currentCharacter == "Professor Plum") {
+            return "<img src='../static/plum-piece.png' id='plum-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/plum-piece.png' id='plum-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Mr. Green") {
+          if (currentCharacter == "Mr. Green") {
+            return "<img src='../static/green-piece.png' id='green-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/green-piece.png' id='green-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Colonel Mustard") {
+          if (currentCharacter == "Colonel Mustard") {
+            return "<img src='../static/mustard-piece.png' id='mustard-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/mustard-piece.png' id='mustard-piece' class='pieces'>";
+          }
+        }
+        else if (character == "Mrs. White") {
+          if (currentCharacter == "Mrs. White") {
+            return "<img src='../static/white-piece.png' id='white-piece' class='current-player'>";
+          }
+          else {
+            return "<img src='../static/white-piece.png' id='white-piece' class='pieces'>";
+          }
         }
       }
 
@@ -478,12 +575,38 @@
       $("#suggest").click(function() {
         var weapon = $('#weapon-sugg :selected').text();
         var character = $('#character-sugg :selected').text();
+        suggestPlayer = "{{ user.username }}";
         $.post("{% url 'suggestion' %}", {csrfmiddlewaretoken : "{{ csrf_token }}",
           weapon: weapon, character: character})
           .done(function(data) {
             data = JSON.parse(data);
             updatePage(data);
             updateMovement(data.validMoves)
+            suggestion = data.suggestion;
+            console.log(suggestPlayer);
+            console.log(suggestion);
+            console.log(data.disprovePlayer);
+          })
+      });
+
+      $("#disprove-sugg").click(function() {
+        var card = $('#cards-disprove :selected').text();
+        $.post("{% url 'disprove' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", card: card, forfeit: false})
+          .done(function(data) {
+            data = JSON.parse(data);
+            updatePage(data);
+            updateMovement(data.validMoves)
+            disproveInit = false;
+          })
+      });
+
+      $("#cannot-disprove").click(function() {
+        $.post("{% url 'disprove' %}", {csrfmiddlewaretoken : "{{ csrf_token }}", card: "", forfeit: true})
+          .done(function(data) {
+            data = JSON.parse(data);
+            updatePage(data);
+            updateMovement(data.validMoves)
+            disproveInit = false;
           })
       });
 

@@ -53,13 +53,13 @@ class Player(models.Model):
             if self.status != "lost":
                 if not self.hasMovedThisTurn:
                     if self.inRoom():
-                        if not self.hasMadeSuggestionThisTurn and (self.hasMadeSuggestionInRoom or self.movedBySuggestion):  
-                            queryset = Hallway.objects.filter(room1=self.currentRoom) | Hallway.objects.filter(room2=self.currentRoom)
-                            for hallway in queryset:
-                                if not hallway.isOccupied():
-                                    move_list.append(hallway.name)
-                            if self.currentRoom.hasSecretPassage:
-                                move_list.append(SECRET_PASSAGES[self.currentRoom.name])
+                        #if not self.hasMadeSuggestionThisTurn and (self.hasMadeSuggestionInRoom or self.movedBySuggestion):  
+                        queryset = Hallway.objects.filter(room1=self.currentRoom) | Hallway.objects.filter(room2=self.currentRoom)
+                        for hallway in queryset:
+                            if not hallway.isOccupied():
+                                move_list.append(hallway.name)
+                        if self.currentRoom.hasSecretPassage:
+                            move_list.append(SECRET_PASSAGES[self.currentRoom.name])
                     else:
                         if self.currentHallway != None:
                             move_list.append(self.currentHallway.room1.name)
@@ -97,8 +97,10 @@ class Game(models.Model):
     status = models.CharField(max_length=20, null=True)
     name = models.CharField(max_length=50)
     currentPlayer = models.ForeignKey(Player, on_delete=models.SET_NULL, related_name="current_player_turn", null=True)
+    disprovePlayer = models.CharField(max_length=500, null=True)
     board = models.OneToOneField('Board', on_delete=models.SET_NULL, null=True)
     specialMessage = models.CharField(max_length=500, default="") #message that only the current player will be able to see
+    currentSuggestion = models.CharField(max_length=200, null=True)
 
     #initializes the game state by assigning the players to the game creating the board, rooms,
     #   and hallways, assigns a character to each player, and sets game status to "not started"
@@ -224,6 +226,16 @@ class Game(models.Model):
             state['currentPlayer'] = self.currentPlayer.user.username
             state['validMoves'] = moves
             state['validActions'] = player.getValidActions()
+
+        if self.disprovePlayer:
+            state['disprovePlayer'] = self.disprovePlayer
+        else:
+            state['disprovePlayer'] = ""
+        
+        if self.currentSuggestion:
+            state['currentSuggestion'] = self.currentSuggestion.split(',')
+        else:
+            state['currentSuggestion'] = []
 
         players = Player.objects.filter(game=self)
         state['board']['starting'] = []
