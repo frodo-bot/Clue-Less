@@ -14,12 +14,13 @@ table td {
   color: yellow;
 }
 .hallway {
-  background: goldenrod;
-  background-image: url(hallway.jpeg); 
+  background: rgb(231, 206, 64);
+  background-image: url(hallway.jpg); 
   background-size:100% 100%;
+  font-family: "Georgia", Georgia, serif;
 }
 .starting {
-  background: lawngreen;
+  background: rgb(231, 206, 64);
 }
 .empty {
   border: 0px;
@@ -78,6 +79,36 @@ table td {
 
 #kitchen {
   background-image: url(kitchen.png); 
+  background-size:100% 100%;
+}
+
+#scarlet-starting {
+  background-image: url(scarlet-starting.png); 
+  background-size:100% 100%;
+}
+
+#peacock-starting {
+  background-image: url(peacock-starting.png); 
+  background-size:100% 100%;
+}
+
+#plum-starting {
+  background-image: url(plum-starting.png); 
+  background-size:100% 100%;
+}
+
+#green-starting {
+  background-image: url(green-starting.png); 
+  background-size:100% 100%;
+}
+
+#white-starting {
+  background-image: url(white-starting.png); 
+  background-size:100% 100%;
+}
+
+#mustard-starting {
+  background-image: url(mustard-starting.png); 
   background-size:100% 100%;
 }
 
