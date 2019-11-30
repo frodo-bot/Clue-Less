@@ -114,8 +114,37 @@ table td {
   background-size:100% 100%;
 }
 
-/*TODO*/
+#container {
+  position: relative;
+}
+
+#container > * {
+  position: absolute;
+}
+
 .options {
   width: 100%;
   overflow: hidden;
+}
+
+.options-inner {
+  width: 250px;
+  float: left;
+}
+
+.left {
+  left: 0;
+  margin-top: 200px;
+}
+
+.right {
+  right: 0;
+}
+
+.top {
+  top: 0;
+}
+
+.bottom {
+  bottom: 0;
 }
