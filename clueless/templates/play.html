@@ -140,7 +140,7 @@
   </table>
   </div>
 
-  <h3>Notification</h3>
+  <h3>Notifications</h3>
   <p id="notification"></p>
 
   <button id="end-turn">End Turn</button>
@@ -288,7 +288,6 @@
 
       function updatePage(data){
         console.log(data);
-        showMessage(data.notification, "all");
         if (data.status == "won") {
           $("#end-game").show();
           $("#end-turn").attr("disabled", true);
@@ -330,8 +329,12 @@
             }
           }
           $("#end-game").hide();
-          if (data.specialMessage.length > 0) {
+          if (data.specialMessage.length > 0 && data.currentPlayer == "{{ user.get_username }}") {
             showMessage(data.specialMessage, data.currentPlayer);
+            //showMessage(data.notification, "all", true, data.currentPlayer);
+          }
+          else {
+            showMessage(data.notification, "all");
           }
           $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
           updateBoard(data.board, data.currentCharacter);
@@ -538,16 +541,47 @@
       }
 
       function showMessage(message, audience) {
+        var existing = $("#notification").html();
+        existing = existing.split("<br>");
+        existing = existing.filter(function(e){return e != ""});
+        console.log(existing);
         var newText = "";
-        if (audience === "all") {
-          newText = message + "<br/>";
-        }
-        else if (audience === "{{ user.username }}") {
-          newText = message + "<br/>";
+        if (existing[0] == message) {
+          newText = $("#notification").html();
+          console.log("NO CHANGE")
         }
         else {
-          newText = $("#notification").text()
-        }
+          if (audience == "all") {
+            if (existing.length < 5) {
+              newText = message + "<br/>" + $("#notification").html();
+              console.log(newText);
+            }
+            else {
+              existing.pop();
+              existing.unshift(message);
+              newText = existing.join("<br/>");
+              console.log(newText);
+            }
+          }
+          else if (audience === "{{ user.username }}") {
+            if (existing.length < 5) {
+              newText = message + "<br/>" + $("#notification").html();
+              console.log("SPECIAL MESSAGE, LESS THAN 5 NOTIFS");
+              console.log(newText);
+            }
+            else {
+              existing.pop();
+              existing.unshift(message);
+              newText = existing.join("<br/>");
+              console.log("SPECIAL MESSAGE, MORE THAN 5 NOTIFS")
+              console.log(newText);
+            }
+          }
+          else {
+            newText = $("#notification").html();
+            console.log("NO CHANGE")
+          }
+        } 
         $("#notification").html(newText);
       }
 
