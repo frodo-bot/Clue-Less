@@ -16,9 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
+from django.contrib.auth import views
+from clueless_project.forms import LoginForm
 
 urlpatterns = [
     path('', include('clueless.urls')),
-    path('', include('django.contrib.auth.urls')),
+    path('', include('django.contrib.auth.urls'), {'authentication_form': LoginForm}),
+    #path('login/', ),
     path('admin/', admin.site.urls),
 ]

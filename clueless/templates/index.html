@@ -5,9 +5,18 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-  <h1>Hi {{ user.username }}!</h1>
-  <a href="{% url 'lobby' %}">Join Game</a>
-  <p><a href="{% url 'logout' %}">logout</a></p>
+<div class='container h-100 d-flex justify-content-center align-items-center'>
+    <div class='col-sm-6'>
+      <div class='card'>
+        <img class="card-img-top" src="../static/logo_slogan.png" alt="Card image">
+        <div class='card-header bg-info text-white' style="font-size: 30px; font-style: bold;">Hi {{ user.username }}!</div>
+        <div class='card-body'>
+            <a href="{% url 'lobby' %}" class="card-link">Join Game</a>
+            <a href="{% url 'logout' %}" class="card-link">Logout</a>
+          </div>
+        </div>
+      </div>
+  </div>
 {% else %}
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log in</a>

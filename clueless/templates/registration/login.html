@@ -4,10 +4,19 @@
 {% block title %}Clue-Less Login{% endblock %}
 
 {% block content %}
-<h2>Login</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
+<div class='container h-100 d-flex justify-content-center align-items-center'>
+  <div class='col-sm-6'>
+    <div class='card'>
+      <img class="card-img-top" src="../static/logo.png" alt="Card image">
+      <div class='card-header bg-info text-white'>Login</div>
+      <div class='card-body'>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit">Login</button>
+        </form>
+        </div>
+      </div>
+    </div>
+</div>
 {% endblock %} 
