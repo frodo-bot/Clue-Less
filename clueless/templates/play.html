@@ -287,13 +287,13 @@
       }
 
       function updatePage(data){
-        console.log(data);
+        //console.log(data);
         if (data.specialMessage.length > 0 && data.currentPlayer == "{{ user.get_username }}") {
             showMessage(data.specialMessage, data.currentPlayer);
             //showMessage(data.notification, "all", true, data.currentPlayer);
           }
         else {
-          showMessage(data.notification, "all");
+            showMessage(data.notification, "all");
         }
         if (data.status == "won") {
           $("#end-game").show();
@@ -336,7 +336,6 @@
             }
           }
           $("#end-game").hide();
-
           $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
           updateBoard(data.board, data.currentCharacter);
           console.log(data.disprovePlayer.length)
