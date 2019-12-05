@@ -5,12 +5,13 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<div class='container h-100 d-flex justify-content-center align-items-center'>
-    <div class='col-sm-6'>
+<div class='container h-100 d-flex justify-content-center align-items-center'">
+    <div class='col-md-6 col-lg-9'>
       <div class='card'>
-        <img class="card-img-top" src="../static/logo_slogan.png" alt="Card image">
+        <img class="card-img-top" src="../static/logo_slogan.png" alt="Card image" style="height: 200px; width: 550px; align-self: center;">
         <div class='card-header bg-info text-white' style="font-size: 30px; font-style: bold;">Hi {{ user.username }}!</div>
         <div class='card-body'>
+            <p class="card-text">Click Join Game to enter the pre-game lobby.</p>
             <a href="{% url 'lobby' %}" class="card-link">Join Game</a>
             <a href="{% url 'logout' %}" class="card-link">Logout</a>
           </div>
@@ -18,9 +19,65 @@
       </div>
   </div>
 {% else %}
-  <p>You are not logged in</p>
-  <a href="{% url 'login' %}">Log in</a>
-  <p>Don't have an account?</p>
-  <a href="{% url 'signup' %}">Sign up</a>
+<div class='container h-100 d-flex justify-content-center align-items-center'">
+    <div class='col-md-6 col-lg-9'>
+      <div class='card'>
+        <img class="card-img-top" src="../static/logo_slogan.png" alt="Card image" style="height: 200px; width: 550px; align-self: center;">
+        <div class='card-header bg-info text-white' style="font-size: 30px; font-style: bold;">Welcome to Clue-Less!</div>
+        <div class='card-body'>
+            <p class="card-text">This game is a simplified verison of the classic Clue® game. The main differences between the two games are in the movement rules. Click <a href="#" data-toggle="modal" data-target="#rules" class="card-link">here</a> to read the modified movement rules. If you need a refresher on the traditional Clue® rules, click <a href="https://www.hasbro.com/common/instruct/clueins.pdf" target="_blank">here</a>.</p>
+            <p class="card-text">If you've already created an account, click Log in below.</p>
+            <a href="{% url 'login' %}" class="card-link">Log in</a>
+            <p class="card-text">Don't have an account?</p>
+            <a href="{% url 'signup' %}" class="card-link">Sign up</a>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="modal" id="rules">
+      <div class="modal-dialog">
+        <div class="modal-content">
+    
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Clue-Less Rules</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+    
+          <!-- Modal body -->
+          <div class="modal-body">
+              In Clue-Less there are the same nine rooms, six weapons, and six people as in the classic board game. 
+              <ul>
+              <li>The rooms are laid out in a 3x3 grid with a hallway separating each pair of adjacent rooms.</li>
+              <li>Each hallway only holds one person. If someone is currently in a hallway, you may not move there.</li>
+              <li>When it is your turn, you don’t need to roll a die.</li>
+              <li>Your options of moving are limited to the following:</li>
+              <ul>
+              <li>If you are in a room, you may do one of the following:</li>
+              <ul>
+              <li>Move through one of the doors to the hallway (if it is not blocked).</li>
+              <li>Take a secret passage to a diagonally opposite room (if there is one) and make a suggestion.</li>
+              <li>If you were moved to the room by another player making a suggestion, you may, if you wish, stay in that room and make a suggestion. Otherwise you may move through a doorway or take a secret passage as described above.</li>
+              </ul>
+              <li>If you are in a hallway, you must do the following:</li>
+              <ul>
+              <li>Move to one of the two rooms accessible from that hallway and make a suggestion.</li>
+              </ul>
+              </ul>
+              <li>If all of the exits are blocked (i.e., there are people in all of the hallways) and you are not in one of the corner rooms (with a secret passage), and you weren’t moved to the room by another player making a suggestion, you lose your turn (except for maybe making an accusation).</li>
+              <li>Your first move must be to the hallway that is adjacent to your home square. The inactive characters stay in their home squares until they are moved to a room by someone making a suggestion.</li>
+              <li>Whenever a suggestion is made, the room must be the room the one making the suggestion is currently in. The suspect in the suggestion is moved to the room in the suggestion.</li>
+              <li>You may make an accusation at any time during your turn.</li>
+            </ul>
+          </div>
+    
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+    
+        </div>
+      </div>
+    </div>
 {% endif %}
 {% endblock %}

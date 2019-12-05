@@ -288,6 +288,13 @@
 
       function updatePage(data){
         console.log(data);
+        if (data.specialMessage.length > 0 && data.currentPlayer == "{{ user.get_username }}") {
+            showMessage(data.specialMessage, data.currentPlayer);
+            //showMessage(data.notification, "all", true, data.currentPlayer);
+          }
+        else {
+          showMessage(data.notification, "all");
+        }
         if (data.status == "won") {
           $("#end-game").show();
           $("#end-turn").attr("disabled", true);
@@ -329,15 +336,10 @@
             }
           }
           $("#end-game").hide();
-          if (data.specialMessage.length > 0 && data.currentPlayer == "{{ user.get_username }}") {
-            showMessage(data.specialMessage, data.currentPlayer);
-            //showMessage(data.notification, "all", true, data.currentPlayer);
-          }
-          else {
-            showMessage(data.notification, "all");
-          }
+
           $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
           updateBoard(data.board, data.currentCharacter);
+          console.log(data.disprovePlayer.length)
           if (data.currentPlayer == "{{ user.get_username }}") {
             $("#end-turn").attr("disabled", false);
             if (!currentPlayerInit) {
@@ -353,6 +355,7 @@
             $("#character-sugg").attr("disabled", false);
             $("#weapon-sugg").attr("disabled", false);
             $("#suggest").attr("disabled", false);
+            $("#end-turn").attr("disabled", true)
           }
           else {
             $("#character-sugg").attr("disabled", true);
@@ -367,6 +370,22 @@
             $("#accuse").attr("disabled", false);
           }
           else {
+            $("#character-acc").attr("disabled", true);
+            $("#weapon-acc").attr("disabled", true);
+            $("#room-acc").attr("disabled", true);
+            $("#accuse").attr("disabled", true);
+          }
+
+          if (data.validMoves.hallways.length > 0) {
+             $("#end-turn").attr("disabled", true);
+          }
+          if (data.validMoves.rooms.length > 0) {
+            $("#end-turn").attr("disabled", true);
+          }
+
+          if (data.disprovePlayer.length > 0) {
+            console.log("hello world")
+            $("#end-turn").attr("disabled", true);
             $("#character-acc").attr("disabled", true);
             $("#weapon-acc").attr("disabled", true);
             $("#room-acc").attr("disabled", true);
@@ -544,42 +563,33 @@
         var existing = $("#notification").html();
         existing = existing.split("<br>");
         existing = existing.filter(function(e){return e != ""});
-        console.log(existing);
         var newText = "";
         if (existing[0] == message) {
           newText = $("#notification").html();
-          console.log("NO CHANGE")
         }
         else {
           if (audience == "all") {
             if (existing.length < 5) {
               newText = message + "<br/>" + $("#notification").html();
-              console.log(newText);
             }
             else {
               existing.pop();
               existing.unshift(message);
               newText = existing.join("<br/>");
-              console.log(newText);
             }
           }
           else if (audience === "{{ user.username }}") {
             if (existing.length < 5) {
               newText = message + "<br/>" + $("#notification").html();
-              console.log("SPECIAL MESSAGE, LESS THAN 5 NOTIFS");
-              console.log(newText);
             }
             else {
               existing.pop();
               existing.unshift(message);
               newText = existing.join("<br/>");
-              console.log("SPECIAL MESSAGE, MORE THAN 5 NOTIFS")
-              console.log(newText);
             }
           }
           else {
             newText = $("#notification").html();
-            console.log("NO CHANGE")
           }
         } 
         $("#notification").html(newText);
@@ -617,9 +627,6 @@
             updatePage(data);
             updateMovement(data.validMoves)
             suggestion = data.suggestion;
-            console.log(suggestPlayer);
-            console.log(suggestion);
-            console.log(data.disprovePlayer);
           })
       });
 
