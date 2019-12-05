@@ -160,3 +160,7 @@ table td {
 .custom-select {
   width: 80%;
 }
+
+.scratchpad table, th {
+  border: 1px solid black;
+}
