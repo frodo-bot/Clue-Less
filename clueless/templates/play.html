@@ -338,6 +338,7 @@
           $("#end-game").hide();
           $("#current-player").html(data.currentPlayer + " (" + data.currentCharacter + ")");
           updateBoard(data.board, data.currentCharacter);
+          console.log(data.disprovePlayer.length)
           if (data.currentPlayer == "{{ user.get_username }}") {
             $("#end-turn").attr("disabled", false);
             if (!currentPlayerInit) {
@@ -353,6 +354,7 @@
             $("#character-sugg").attr("disabled", false);
             $("#weapon-sugg").attr("disabled", false);
             $("#suggest").attr("disabled", false);
+            $("#end-turn").attr("disabled", true)
           }
           else {
             $("#character-sugg").attr("disabled", true);
@@ -367,6 +369,22 @@
             $("#accuse").attr("disabled", false);
           }
           else {
+            $("#character-acc").attr("disabled", true);
+            $("#weapon-acc").attr("disabled", true);
+            $("#room-acc").attr("disabled", true);
+            $("#accuse").attr("disabled", true);
+          }
+
+          if (data.validMoves.hallways.length > 0) {
+             $("#end-turn").attr("disabled", true);
+          }
+          if (data.validMoves.rooms.length > 0) {
+            $("#end-turn").attr("disabled", true);
+          }
+
+          if (data.disprovePlayer.length > 0) {
+            console.log("hello world")
+            $("#end-turn").attr("disabled", true);
             $("#character-acc").attr("disabled", true);
             $("#weapon-acc").attr("disabled", true);
             $("#room-acc").attr("disabled", true);

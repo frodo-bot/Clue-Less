@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 
+
 urlpatterns = [
     path('', include('clueless.urls')),
     path('', include('django.contrib.auth.urls')),
