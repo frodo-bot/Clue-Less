@@ -1,15 +1,19 @@
+body {
+  background: #effae0;
+}
 table td {
   border: 4px solid black;
-  height: 150px;
-  width: 150px;
+  height: 115px;
+  width: 115px;
 }
 
 
 .board {
+  width: auto;
   text-align: center;
   vertical-align: center;
-  margin-left:25%;
-  margin-right:25%;
+  margin-left:auto;
+  margin-right:10%;
 }
 .room {
   background: peru;
@@ -134,7 +138,7 @@ table td {
 
 .left {
   left: 0;
-  margin-top: 200px;
+  margin-top: 150px;
 }
 
 .right {
@@ -147,4 +151,12 @@ table td {
 
 .bottom {
   bottom: 0;
+}
+
+.left-all {
+  margin-left: 25px;
+}
+
+.custom-select {
+  width: 80%;
 }

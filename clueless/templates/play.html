@@ -5,24 +5,27 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-  <h1 id="title">Play Game</h1>
+  <h1 id="title" style="text-align: center; font-size: 3.5em; font-weight: bold;">Clue-Less</h1>
+  <hr style="align:center;width:30%;" />
 
-  <h3>Your Username - {{ user.username }}</h3>
+  <h3 style="margin-left:10px;">Welcome, {{ user.username }}!</h3>
+  <br />
 
-  <h3>Player List</h3>
-  <ul id="player-list"></ul>
+  <div>
+    <div style="width: 25%; float: left;" class="left-all">
+      <h3>Player List</h3>
+      <ul id="player-list"></ul>
+    </div>
+    <div style="width: 25%; float: left;">
+      <h3>Current Player</h3>
+      <p id="current-player"></p>
+    </div>
+  </div>
 
-  <h3>Current Player</h3>
-  <p id="current-player"></p>
 
-  <h3>Notification</h3>
-  <p id="notification"></p>
-
-  <button id="end-turn">End Turn</button>
-  <a id="end-game" class="btn btn-info" href="{% url 'endgame' %}">End Game</a>
 
   <div id="container">
-    <div class="left">
+    <div class="left left-all">
       <div class="options">
           <div id="disprove-div" class="options-inner">
             <h3>Disprove Suggestion</h3>
@@ -34,9 +37,9 @@
           </div>
           <div class="options-inner">
               <h3>Movement</h3>
-              <select id="rooms"></select> <button id="move-room">Move to Room</button>
+              <select class="custom-select" id="rooms"></select> <button id="move-room">Move to Room</button>
               <br/> <br/>
-              <select id="hallways"></select> <button id="move-hallway">Move to Hallway</button>
+              <select class="custom-select" id="hallways"></select> <button id="move-hallway">Move to Hallway</button>
           </div>
       </div>
       <div class="options">
@@ -44,7 +47,7 @@
           <h3>Make Suggestion</h3>
 
           <h4>Character:</h4>
-          <select id="character-sugg">
+          <select class="custom-select" id="character-sugg">
             <option value="Miss Scarlet">Miss Scarlet</option>
             <option value="Mrs. Peacock">Mrs. Peacock</option>
             <option value="Professor Plum">Professor Plum</option>
@@ -56,7 +59,7 @@
           <br/>
 
           <h4>Weapon:</h4>
-          <select id="weapon-sugg">
+          <select class="custom-select" id="weapon-sugg">
             <option value="Rope">Rope</option>
             <option value="Lead Pipe">Lead Pipe</option>
             <option value="Knife">Knife</option>
@@ -71,7 +74,7 @@
           <h3>Make Accusation</h3>
 
           <h4>Character:</h4>
-          <select id="character-acc">
+          <select class="custom-select" id="character-acc">
             <option value="Miss Scarlet">Miss Scarlet</option>
             <option value="Mrs. Peacock">Mrs. Peacock</option>
             <option value="Professor Plum">Professor Plum</option>
@@ -83,7 +86,7 @@
           <br/>
 
           <h4>Weapon:</h4>
-          <select id="weapon-acc">
+          <select class="custom-select" id="weapon-acc">
             <option value="Rope">Rope</option>
             <option value="Lead Pipe">Lead Pipe</option>
             <option value="Knife">Knife</option>
@@ -95,7 +98,7 @@
           <br/>
 
           <h4>Room:</h4>
-          <select id="room-acc">
+          <select class="custom-select" id="room-acc">
             <option value="Study">Study</option>
             <option value="Hall">Hall</option>
             <option value="Lounge">Lounge</option>
@@ -110,6 +113,13 @@
           <button id="accuse">Make Accusation</button>
         </div>
       </div>
+      <br />
+      <button id="end-turn">End Turn</button>
+      <a id="end-game" class="btn btn-info" href="{% url 'endgame' %}">End Game</a>
+      <br />
+      <br />
+      <h3>Notifications</h3>
+      <p id="notification"></p>
     </div>
     <div class="board right">
       <table id="board">
@@ -235,6 +245,8 @@
       </table>
     </div>
   </div>
+
+
 
   <script>
     $(document).ready( function() {
