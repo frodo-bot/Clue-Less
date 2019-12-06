@@ -5,18 +5,21 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-  <h1>Clue-Less Lobby</h1>
-
-  <h3>Your Username - {{ user.username }}</h3>
-
-  <a href="{% url 'lobby-leave' %}">Leave Lobby</a>
-  <br /><br />
-  <button id="create-button" disabled>Create Game</button>
-  <br />
-  <h2>Players:</h2>
-
-  <ul id="player-list"></ul>
-
+  <div class="container h-100 d-flex justify-content-center align-items-center">
+    <div class='col-md-6 col-lg-9'>
+      <div class='card'>
+        <img class="card-img-top" src="../static/logo_slogan.png" alt="Card image" style="height: 200px; width: 550px; align-self: center;">
+        <div class='card-header bg-info text-white' style="font-size: 30px; font-style: bold;">Hi {{ user.username }}!</div>
+        <div class='card-body'>
+          <p class="card-text">This is the pre-game lobby. Once at least three people have joined, a game of Clue-Less can be created.</p>
+          <button id="create-button" class="card-link btn btn-primary" disabled>Create Game</button>
+          <a href="{% url 'lobby-leave' %}" class="card-link">Leave Lobby</a> 
+          <br /> <br />
+          <ul id="player-list" class="list-group"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
       $(document).ready( function() {
           var players = [];
@@ -39,7 +42,7 @@
                   players = data.players;
                   var playerList = "";
                   data.players.forEach(function(item) {
-                    playerList += "<li>" + item + "</li>";
+                    playerList += "<li class='list-group-item'>" + item + "</li>";
                   });
                   $("#player-list").html(playerList);
 
