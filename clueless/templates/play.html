@@ -5,300 +5,349 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-  <h1 id="title" style="text-align: center; font-size: 3.5em; font-weight: bold;">Clue-Less</h1>
-  <hr style="align:center;width:30%;" />
 
-  <h3 style="margin-left:10px;">Welcome, {{ user.username }}!</h3>
-  <br />
+{#  Clue - Less  #}
+<img class="center" src="../static/logo.png" alt="Card image" style="height: 100px; width: 350px; align-self: center;">
+<hr style="align:center;width:30%;" />
 
-  <div>
-    <div style="width: 25%; float: left;" class="left-all">
-      <h3>Player List</h3>
-      <ul id="player-list"></ul>
-    </div>
-    <div style="width: 25%; float: left;">
-      <h3>Current Player</h3>
-      <p id="current-player"></p>
-    </div>
-  </div>
+{#  Main container div  #}
+<div id="container">
 
-
-
-  <div id="container">
+    {# Left Column #}
     <div class="left left-all">
-      <div class="options">
-          <div id="disprove-div" class="options-inner">
-            <h3>Disprove Suggestion</h3>
-            <select id="cards-disprove"></select> <button id="disprove-sugg">Disprove Suggestion</button> <button id="cannot-disprove">Forfeit Disprove</button>
-          </div>
-          <div class="options-inner">
-            <h3>Your Cards</h3>
-            <ul id="cards"></ul>
-          </div>
-          <div class="options-inner">
-              <h3>Movement</h3>
-              <select class="custom-select" id="rooms"></select> <button id="move-room">Move to Room</button>
-              <br/> <br/>
-              <select class="custom-select" id="hallways"></select> <button id="move-hallway">Move to Hallway</button>
-          </div>
-      </div>
-      <div class="options">
-        <div class="options-inner">
-          <h3>Make Suggestion</h3>
+        <div class="options">
+            <!--div class="options-inner"-->
 
-          <h4>Character:</h4>
-          <select class="custom-select" id="character-sugg">
-            <option value="Miss Scarlet">Miss Scarlet</option>
-            <option value="Mrs. Peacock">Mrs. Peacock</option>
-            <option value="Professor Plum">Professor Plum</option>
-            <option value="Mr. Green">Mr. Green</option>
-            <option value="Colonel Mustard">Colonel Mustard</option>
-            <option value="Mrs. White">Mrs. White</option>
-          </select>
+            <p class="title" style="font-size:150%;">Welcome, {{ user.username }}!</p>
+            <br />
 
-          <br/>
+            <div style="width:400px;">
+                <div style="width:350px;">
+                    <p class="title">Player List</p>
+                    <ul id="player-list"></ul>
+                </div>
+                <div style="float:right; margin-top:-130px;">
+                    <p class="title">Current Player</p>
+                    <p id="current-player" style="margin-left: 20px; margin-top:-5px;"></p>
+                </div>
+            </div>
 
-          <h4>Weapon:</h4>
-          <select class="custom-select" id="weapon-sugg">
-            <option value="Rope">Rope</option>
-            <option value="Lead Pipe">Lead Pipe</option>
-            <option value="Knife">Knife</option>
-            <option value="Wrench">Wrench</option>
-            <option value="Candlestick">Candlestick</option>
-            <option value="Revolver">Revolver</option>
-          </select>
-          <br/> <br/>
-          <button id="suggest">Make Suggestion</button>
+            <div>
+                <p class="title">Your Cards</p>
+                <ul id="cards" class="list-group" style="margin-left:20px;"></ul>
+            </div>
+
+            <p class="title" style="margin-top:30px;">Notifications</p>
+            <p id="notification" style="max-width: 450px; margin-left:10px;"></p>
+
         </div>
-        <div class="options-inner">
-          <h3>Make Accusation</h3>
-
-          <h4>Character:</h4>
-          <select class="custom-select" id="character-acc">
-            <option value="Miss Scarlet">Miss Scarlet</option>
-            <option value="Mrs. Peacock">Mrs. Peacock</option>
-            <option value="Professor Plum">Professor Plum</option>
-            <option value="Mr. Green">Mr. Green</option>
-            <option value="Colonel Mustard">Colonel Mustard</option>
-            <option value="Mrs. White">Mrs. White</option>
-          </select>
-
-          <br/>
-
-          <h4>Weapon:</h4>
-          <select class="custom-select" id="weapon-acc">
-            <option value="Rope">Rope</option>
-            <option value="Lead Pipe">Lead Pipe</option>
-            <option value="Knife">Knife</option>
-            <option value="Wrench">Wrench</option>
-            <option value="Candlestick">Candlestick</option>
-            <option value="Revolver">Revolver</option>
-          </select>
-
-          <br/>
-
-          <h4>Room:</h4>
-          <select class="custom-select" id="room-acc">
-            <option value="Study">Study</option>
-            <option value="Hall">Hall</option>
-            <option value="Lounge">Lounge</option>
-            <option value="Library">Library</option>
-            <option value="Billiard Room">Billiard Room</option>
-            <option value="Dining Room">Dining Room</option>
-            <option value="Conservatory">Conservatory</option>
-            <option value="Ballroom">Ballroom</option>
-            <option value="Kitchen">Kitchen</option>
-          </select>
-          <br/> <br/>
-          <button id="accuse">Make Accusation</button>
-        </div>
-      </div>
-      <br />
-      <button id="end-turn">End Turn</button>
-      <a id="end-game" class="btn btn-info" href="{% url 'endgame' %}">End Game</a>
-      <br />
-      <br />
-      <h3>Notifications</h3>
-      <p id="notification"></p>
     </div>
-    <div class="board right">
-      <table id="board">
-        <tbody>
-          <tr>
-            <td class="empty"></td>
-            <td class="empty"></td>
-            <td class="empty"></td>
-            <td class="empty"></td>
-            <td id="scarlet-starting" class="starting"></td>
-            <td class="empty"></td>
-            <td class="empty"></td>
-          </tr>
-          <tr>
-            <td class="empty"></td>
-            <td  id="study" class="room">
-              <p id="study-players"></p>
-            </td>
-            <td class="hallway">
-              <b>Study - Hall</b>
-              <p id="study-hall-players"></p>
-            </td>
-            <td id="hall" class="room">
-              <p id="hall-players"></p>
-            </td>
-            <td class="hallway">
-              <b>Hall - Lounge</b>
-              <p id="hall-lounge-players"></p>
-            </td>
-            <td id="lounge" class="room">
-              <p id="lounge-players"></p>
-            </td>
-            <td class="empty"></td>
-          </tr>
-          <tr>
-            <td id="plum-starting" class="starting"></td>
-            <td class="hallway">
-                <b>Study - Library</b>
-                <p id="study-library-players"></p>
-            </td>
-            <td class="empty"></td>
-            <td class="hallway">
-                <b>Hall - Billiard Room</b>
-                <p id="hall-billiard-players"></p>
-            </td>
-            <td class="empty"></td>
-            <td class="hallway">
-                <b>Lounge - Dining Room</b>
-                <p id="lounge-dining-players"></p>
-            </td>
-            <td id="mustard-starting" class="starting"></td>
-          </tr>
-          <tr>
-            <td class="empty"></td>
-            <td id="library" class="room">
-                <p id="library-players"></p>
-            </td>
-            <td class="hallway">
-                <b>Library - Billiard Room</b>
-                <p id="library-billiard-players"></p>
-            </td>
-            <td id="billiard" class="room">
-                <p id="billiard-players"></p>
-            </td>
-            <td class="hallway">
-                <b>Billiard Room - Dining Room</b>
-                <p id="billiard-dining-players"></p>
-            </td>
-            <td id="dining" class="room">
-                <p id="dining-players"></p>
-            </td>
-            <td class="empty"></td>
-          </tr>
-          <tr>
-            <td id="peacock-starting" class="starting"></td>
-            <td class="hallway">
-                <b>Library - Conservatory</b>
-                <p id="library-conservatory-players"></p>
-            </td>
-            <td class="empty"></td>
-            <td class="hallway">
-                <b>Billiard Room - Ballroom</b>
-                <p id="billiard-ballroom-players"></p>
-            </td>
-            <td class="empty"></td>
-            <td class="hallway">
-                <b>Dining Room - Kitchen</b>
-                <p id="dining-kitchen-players"></p>
-            </td>
-            <td class="empty"></td>
-          </tr>
-          <tr>
-            <td class="empty"></td>
-            <td id="conservatory" class="room">
-                <p id="conservatory-players"></p>
-            </td>
-            <td class="hallway">
-                <b>Conservatory - Ballroom</b>
-                <p id="conservatory-ballroom-players"></p>
-            </td>
-            <td id="ballroom" class="room">
-                <p id="ballroom-players"></p>
-            </td>
-            <td class="hallway">
-                <b>Ballroom - Kitchen</b>
-                <p id="ballroom-kitchen-players"></p>
-            </td>
-            <td id="kitchen" class="room">
-                <p id="kitchen-players"></p>
-            </td>
-            <td class="empty"></td>
-          </tr>
-          <tr>
-              <td class="empty"></td>
-              <td class="empty"></td>
-              <td id="green-starting" class="starting"></td>
-              <td class="empty"></td>
-              <td id="white-starting" class="starting"></td>
-              <td class="empty"></td>
-              <td class="empty"></td>
+
+
+
+    {# Main board #}
+    <div class="board">
+        <div>
+        <table id="board">
+            <tbody>
+            {# Row 1 #}
+            <tr>
+                <td class="empty"></td>
+                <td class="empty"></td>
+                <td class="empty"></td>
+                <td class="empty"></td>
+                <td id="scarlet-starting" class="starting"></td>
+                <td class="empty"></td>
+                <td class="empty"></td>
             </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+            {# Row 2 #}
+            <tr>
+                <td class="empty"></td>
+                <td id="study" class="room">
+                    <p id="study-players"></p>
+                </td>
+                <td class="hallway">
+                    <b>Study - Hall</b>
+                    <p id="study-hall-players"></p>
+                </td>
+                <td id="hall" class="room">
+                    <p id="hall-players"></p>
+                </td>
+                <td class="hallway">
+                    <b>Hall - Lounge</b>
+                    <p id="hall-lounge-players"></p>
+                </td>
+                <td id="lounge" class="room">
+                    <p id="lounge-players"></p>
+                </td>
+                <td class="empty"></td>
+            </tr>
+            {# Row 3 #}
+            <tr>
+                <td id="plum-starting" class="starting"></td>
+                <td class="hallway">
+                    <b>Study - Library</b>
+                    <p id="study-library-players"></p>
+                </td>
+                <td class="empty"></td>
+                <td class="hallway">
+                    <b>Hall - Billiard Room</b>
+                    <p id="hall-billiard-players"></p>
+                </td>
+                <td class="empty"></td>
+                <td class="hallway">
+                    <b>Lounge - Dining Room</b>
+                    <p id="lounge-dining-players"></p>
+                </td>
+                <td id="mustard-starting" class="starting"></td>
+            </tr>
+            {# Row 4 #}
+            <tr>
+                <td class="empty"></td>
+                <td id="library" class="room">
+                    <p id="library-players"></p>
+                </td>
+                <td class="hallway">
+                    <b>Library - Billiard Room</b>
+                    <p id="library-billiard-players"></p>
+                </td>
+                <td id="billiard" class="room">
+                    <p id="billiard-players"></p>
+                </td>
+                <td class="hallway">
+                    <b>Billiard Room - Dining Room</b>
+                    <p id="billiard-dining-players"></p>
+                </td>
+                <td id="dining" class="room">
+                    <p id="dining-players"></p>
+                </td>
+                <td class="empty"></td>
+            </tr>
+            {# Row 5 #}
+            <tr>
+                <td id="peacock-starting" class="starting"></td>
+                <td class="hallway">
+                    <b>Library - Conservatory</b>
+                    <p id="library-conservatory-players"></p>
+                </td>
+                <td class="empty"></td>
+                <td class="hallway">
+                    <b>Billiard Room - Ballroom</b>
+                    <p id="billiard-ballroom-players"></p>
+                </td>
+                <td class="empty"></td>
+                <td class="hallway">
+                    <b>Dining Room - Kitchen</b>
+                    <p id="dining-kitchen-players"></p>
+                </td>
+                <td class="empty"></td>
+            </tr>
+            {# Row 6 #}
+            <tr>
+                <td class="empty"></td>
+                <td id="conservatory" class="room">
+                    <p id="conservatory-players"></p>
+                </td>
+                <td class="hallway">
+                    <b>Conservatory - Ballroom</b>
+                    <p id="conservatory-ballroom-players"></p>
+                </td>
+                <td id="ballroom" class="room">
+                    <p id="ballroom-players"></p>
+                </td>
+                <td class="hallway">
+                    <b>Ballroom - Kitchen</b>
+                    <p id="ballroom-kitchen-players"></p>
+                </td>
+                <td id="kitchen" class="room">
+                    <p id="kitchen-players"></p>
+                </td>
+                <td class="empty"></td>
+            </tr>
+            {# Row 7 #}
+            <tr>
+                <td class="empty"></td>
+                <td class="empty"></td>
+                <td id="green-starting" class="starting"></td>
+                <td class="empty"></td>
+                <td id="white-starting" class="starting"></td>
+                <td class="empty"></td>
+                <td class="empty"></td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
 
-<!-- TODO work this into the div layout above -->
-<!--
-  <div class="container">
-  <div class="scratchpad row">
-    <table>
-        <tr>
-            <th colspan="3">Suspects</th>
-        </tr>
-        <tr>
-            <td>Mr. Green</td>
-            <td>Prof. Plum</td>
-            <td>Coln. Mustard</td>
-        </tr>
-        <tr>
-            <td>Mrs. Peacock</td>
-            <td>Miss Scarlet</td>
-            <td>Mrs. White</td>
-        </tr>
-        <tr>
-            <th colspan="3">Weapons</th>
-        </tr>
-        <tr>
-            <td>Candlestick</td>
-            <td>Knife</td>
-            <td>Lead Pipe</td>
-        </tr>
-        <tr>
-            <td>Revolver</td>
-            <td>Rope</td>
-            <td>Wrench</td>
-        </tr>
-        <tr>
-            <th colspan="3">Rooms</th>
-        </tr>
-        <tr>
-            <td>Study</td>
-            <td>Hall</td>
-            <td>Lounge</td>
-        </tr>
-        <tr>
-            <td>Library</td>
-            <td>Billiard Room</td>
-            <td>Dining Room</td>
-        </tr>
-        <tr>
-            <td>Conservatory</td>
-            <td>Ballroom</td>
-            <td>Kitchen</td>
-        </tr>
-    </table>
-  </div>
-  </div>
--->
+        <!-- so many divs -->
+        <div>
+            <div>
+                <div style="margin-top: 10px;">
+                    <div>
+                        <select class="custom-select" id="rooms" style="width:50%"></select>
+                    </div>
+                    <div>
+                         <button id="move-room">Move to Room</button>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <div>
+                        <select class="custom-select" id="hallways" style="width:50%"></select>
+                    </div>
+                    <div>
+                        <button id="move-hallway">Move to Hallway</button>
+                    </div>
+                </div>
+            </div>
+            <div style="float:right; margin-top: -110px; margin-right:0px;">
+                <button id="end-turn" class="btn btn-secondary">End Turn</button>
+                <a id="end-game" class="btn btn-success" href="{% url 'endgame' %}">End Game</a>
+            </div>
+        </div>
+    </div>
+
+
+
+    {# Right Column #}
+    <div class="right right-all">
+
+    {# Scratchpad #}
+        <div id="scratchpad" class="scratchpad noBorder">
+            <table style="text-align:center;">
+                <tr style="height:40px;">
+                    <th colspan="3" style="font-family:chalkduster; font-size:120%;">Scratchpad</th>
+                </tr>
+                <tr>
+                    <th colspan="3">Suspects</th>
+                </tr>
+                <tr>
+                    <td>Mr. Green</td>
+                    <td>Prof. Plum</td>
+                    <td>Coln. Mustard</td>
+                </tr>
+                <tr>
+                    <td>Mrs. Peacock</td>
+                    <td>Miss Scarlet</td>
+                    <td>Mrs. White</td>
+                </tr>
+                <tr>
+                    <th colspan="3">Weapons</th>
+                </tr>
+                <tr>
+                    <td>Candlestick</td>
+                    <td>Knife</td>
+                    <td>Lead Pipe</td>
+                </tr>
+                <tr>
+                    <td>Revolver</td>
+                    <td>Rope</td>
+                    <td>Wrench</td>
+                </tr>
+                <tr>
+                    <th colspan="3">Rooms</th>
+                </tr>
+                <tr>
+                    <td>Study</td>
+                    <td>Hall</td>
+                    <td>Lounge</td>
+                </tr>
+                <tr>
+                    <td>Library</td>
+                    <td>Billiard Room</td>
+                    <td>Dining Room</td>
+                </tr>
+                <tr>
+                    <td>Conservatory</td>
+                    <td>Ballroom</td>
+                    <td>Kitchen</td>
+                </tr>
+            </table>
+        </div>
+
+        <br />
+        <br />
+
+        <div class="options" style="margin-left:0px">
+
+        {# Make Suggestion dropdowns/button #}
+            <div style="float:left">
+            <p class="title">Make Suggestion</p>
+
+            <a>Character:</a>
+            <select class="custom-select" id="character-sugg">
+                <option value="Miss Scarlet">Miss Scarlet</option>
+                <option value="Mrs. Peacock">Mrs. Peacock</option>
+                <option value="Professor Plum">Professor Plum</option>
+                <option value="Mr. Green">Mr. Green</option>
+                <option value="Colonel Mustard">Colonel Mustard</option>
+                <option value="Mrs. White">Mrs. White</option>
+            </select>
+
+            <br/>
+
+            <a>Weapon:</a>
+            <select class="custom-select" id="weapon-sugg">
+                <option value="Rope">Rope</option>
+                <option value="Lead Pipe">Lead Pipe</option>
+                <option value="Knife">Knife</option>
+                <option value="Wrench">Wrench</option>
+                <option value="Candlestick">Candlestick</option>
+                <option value="Revolver">Revolver</option>
+            </select>
+            <br/> <br/>
+            <button id="suggest" class="btn btn-warning">Suggest!</button>
+
+            <div id="disprove-div" class="options-inner">
+                <h3>Disprove Suggestion</h3>
+                <select id="cards-disprove"></select> <button id="disprove-sugg">Disprove Suggestion</button> <button id="cannot-disprove">Forfeit Disprove</button>
+            </div>
+            </div>
+        {# Make Accusation dropdowns/button #}
+            <div style="float:right">
+            <p class="title">Make Accusation</p>
+
+            <a>Character:</a>
+            <select class="custom-select" id="character-acc">
+                <option value="Miss Scarlet">Miss Scarlet</option>
+                <option value="Mrs. Peacock">Mrs. Peacock</option>
+                <option value="Professor Plum">Professor Plum</option>
+                <option value="Mr. Green">Mr. Green</option>
+                <option value="Colonel Mustard">Colonel Mustard</option>
+                <option value="Mrs. White">Mrs. White</option>
+            </select>
+
+            <br/>
+
+            <a>Weapon:</a>
+            <select class="custom-select" id="weapon-acc">
+                <option value="Rope">Rope</option>
+                <option value="Lead Pipe">Lead Pipe</option>
+                <option value="Knife">Knife</option>
+                <option value="Wrench">Wrench</option>
+                <option value="Candlestick">Candlestick</option>
+                <option value="Revolver">Revolver</option>
+            </select>
+
+            <br/>
+
+            <a>Room:</a>
+            <select class="custom-select" id="room-acc">
+                <option value="Study">Study</option>
+                <option value="Hall">Hall</option>
+                <option value="Lounge">Lounge</option>
+                <option value="Library">Library</option>
+                <option value="Billiard Room">Billiard Room</option>
+                <option value="Dining Room">Dining Room</option>
+                <option value="Conservatory">Conservatory</option>
+                <option value="Ballroom">Ballroom</option>
+                <option value="Kitchen">Kitchen</option>
+            </select>
+            <br/> <br/>
+            <button id="accuse" class="btn btn-danger">Accuse!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
   <script>
     $(document).ready( function() {
@@ -328,7 +377,7 @@
       $.get("{% url 'playercards' %}", {csrfmiddlewaretoken : "{{ csrf_token }}"})
           .done(function(data) {
             for (var i = 0; i < data.cardList.length; i++) {
-              $("#cards").append('<li>' + data.cardList[i] + "</li>")
+              $("#cards").append('<li class="list-group-item" style="width:40%; height:30%;">' + data.cardList[i] + '</li>')
             }
             playerCards = data.cardList;
           })
@@ -743,14 +792,7 @@
     $(function () {
         var $curParent, Content;
         $(".scratchpad").delegate("td", "click", function () {
-            if ($(this).closest("s").length) {
-                Content = $(this).parent("s").html();
-                $curParent = $(this).closest("s");
-                $(Content).insertAfter($curParent);
-                $(this).closest("s").remove();
-            } else {
-                $(this).wrapAll("<s/>");
-            }
+            $(this).toggleClass('strikethrough');
         });
     });
 
