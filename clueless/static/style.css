@@ -4,6 +4,10 @@ table td {
   width: 100px;
 }
 
+p, a {
+  font-family: optima;
+}
+
 .room {
   background: peru;
   color: yellow;
@@ -13,7 +17,6 @@ table td {
   background: rgb(231, 206, 64);
   background-image: url(hallway.jpg); 
   background-size:100% 100%;
-  font-family: "Georgia", Georgia, serif;
 }
 
 .starting {
@@ -197,10 +200,11 @@ table td {
   text-decoration: line-through;
 }
 
-p, a {
-  font-family: optima;
-}
-
 .title {
   font-weight: bold;
+}
+
+a.hallwaytext {
+  font-family: "Georgia", Georgia, serif;
+  font-size: 80%;
 }
