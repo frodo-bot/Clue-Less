@@ -28,7 +28,7 @@
                 </div>
                 <div style="float:right; margin-top:-130px;">
                     <p class="title">Current Player</p>
-                    <p id="current-player" style="margin-left: 20px; margin-top:-5px; font-family:optima;"></p>
+                    <p id="current-player" style="margin-left: 20px; margin-top:-5px;"></p>
                 </div>
             </div>
 
@@ -186,7 +186,7 @@
                         <select class="custom-select" id="rooms" style="width:50%"></select>
                     </div>
                     <div>
-                         <button id="move-room">Move to Room</button>
+                         <button id="move-room" class="btn btn-outline-dark" style="margin-top: 1%">Move to Room</button>
                     </div>
                 </div>
                 <div style="margin-top: 10px;">
@@ -194,7 +194,7 @@
                         <select class="custom-select" id="hallways" style="width:50%"></select>
                     </div>
                     <div>
-                        <button id="move-hallway">Move to Hallway</button>
+                        <button id="move-hallway" class="btn btn-outline-dark" style="margin-top: 1%">Move to Hallway</button>
                     </div>
                 </div>
             </div>
@@ -211,10 +211,10 @@
     <div class="right right-all">
 
     {# Scratchpad #}
-        <div id="scratchpad" class="scratchpad noBorder" style="font-family:optima;">
+        <div id="scratchpad" class="scratchpad noBorder">
             <table style="text-align:center;">
                 <tr style="height:40px;">
-                    <th colspan="3" style="font-family:chalkduster; font-size:120%;">Scratchpad</th>
+                    <th colspan="3" style="font-size:120%;">Scratchpad</th>
                 </tr>
                 <tr>
                     <th colspan="3">Suspects</th>
@@ -299,8 +299,8 @@
                 <div id="disprove-div" class="options-inner" style="margin-top: 25px;">
                     <p class="title"">Disprove Suggestion</p>
                     <select id="cards-disprove" class="custom-select" style="width: 160px;"></select>
-                    <button id="disprove-sugg" class="btn btn-primary btn-sm" style="width: 160px; margin-top:5px;">Disprove Suggestion</button>
-                    <button id="cannot-disprove" class="btn btn-primary btn-sm" style="width: 160px; margin-top:5px;">Forfeit Disprove</button>
+                    <button id="disprove-sugg" class="btn btn-warning btn-sm" style="width: 160px; margin-top:5px;">Disprove Suggestion</button>
+                    <button id="cannot-disprove" class="btn btn-danger btn-sm" style="width: 160px; margin-top:5px;">Forfeit Disprove</button>
                 </div>
 
             </div>
@@ -400,7 +400,7 @@
         $.get("{% url 'game-players' %}", {}, function(data) {
           var playerList = "";
           data.players.forEach(function(item) {
-            playerList += '<li style="font-family:optima">' + item + '</li>';
+            playerList += '<li>' + item + '</li>';
           });
           $("#player-list").html(playerList);
         });
@@ -416,6 +416,9 @@
             showMessage(data.notification, "all");
         }
         if (data.status == "won") {
+          $('#disprove-div').hide()
+          $("#end-turn").attr('style', "margin-left: 10%;");
+          $("#end-game").attr('style', "margin-left: 10%;margin-top: 1%;");
           $("#end-game").show();
           $("#end-turn").attr("disabled", true);
           $("#rooms").attr("disabled", true);

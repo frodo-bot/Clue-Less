@@ -1,11 +1,11 @@
 table td {
-  border: 4px solid black;
+  border: 3px solid black;
   height: 100px;
   width: 100px;
 }
 
-p, a {
-  font-family: optima;
+* {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .room {
@@ -28,13 +28,13 @@ p, a {
 }
 
 .pieces {
-  height: 40px;
-  width: 30px;
+  height: 35px;
+  width: 25px;
 }
 
 .current-player {
-  height: 45px;
-  width: 35px;
+  height: 40px;
+  width: 30px;
   border: dotted 3px black;
 }
 
@@ -171,7 +171,8 @@ p, a {
   width: auto;
   text-align: center;
   vertical-align: center;
-  margin-left:400px;
+  align-self: center;
+  margin-left:30%;
   margin-right:20%;
 }
 
@@ -188,6 +189,7 @@ p, a {
   border-collapse: collapse !important;
   border: none !important;
   vertical-align: top;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
 }
 
 .scratchpad table {
@@ -207,4 +209,5 @@ p, a {
 a.hallwaytext {
   font-family: "Georgia", Georgia, serif;
   font-size: 80%;
+  font-weight: bold;
 }

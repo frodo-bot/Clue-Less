@@ -51,7 +51,7 @@ class Player(models.Model):
         move_list = []
         if self.game.currentPlayer == self:
             if self.status != "lost":
-                if not self.hasMovedThisTurn:
+                if not self.hasMovedThisTurn and not self.hasMadeSuggestionThisTurn:
                     if self.inRoom():
                         #if not self.hasMadeSuggestionThisTurn and (self.hasMadeSuggestionInRoom or self.movedBySuggestion):  
                         queryset = Hallway.objects.filter(room1=self.currentRoom) | Hallway.objects.filter(room2=self.currentRoom)
